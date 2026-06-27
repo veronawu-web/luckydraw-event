@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>現金轉盤抽獎</title>
+<style>
+:root{
+  --color-primary:#00D2BE;
+  --color-primary-hover:rgba(0,210,190,.8);
+  --color-primary-disabled:rgba(71,71,71,.4);
+  --color-surface:#191919;
+  --color-surface-container:#232323;
+  --color-on-1:#FFFFFF;
+  --color-on-2:#C8C8C8;
+  --color-on-3:#646464;
+  --color-outline:#474747;
+  --color-creator:#FFD100;
+  --color-loverse:#F6418D;
+  --font-family:'PingFang TC',-apple-system,BlinkMacSystemFont,sans-serif;
+  --r-s:8px; --r-m:12px; --r-l:16px;
+}
+*{box-sizing:border-box;}
+body{
+  margin:0; font-family:var(--font-family);
+  background:var(--color-surface); color:var(--color-on-1);
+  -webkit-font-smoothing:antialiased;
+}
+.page{max-width:1080px; margin:0 auto; padding:24px 16px 48px;}
+header.top{margin-bottom:24px;}
+header.top h1{
+  margin:0; font-size:28px; font-weight:700; letter-spacing:.5px;
+  color:var(--color-primary);
+}
+header.top p{margin:6px 0 0; color:var(--color-on-3); font-size:13px;}
+
+.wrap{display:grid; grid-template-columns:minmax(0,440px) 1fr; gap:24px; align-items:start;}
+@media(max-width:880px){ .wrap{grid-template-columns:1fr;} }
+
+.panel{background:var(--color-surface-container); border:1px solid var(--color-outline);
+  border-radius:var(--r-l); padding:20px;}
+
+/* ── 轉盤 ── */
+.stage{position:relative; width:100%; max-width:400px; margin:4px auto 0; aspect-ratio:1;}
+.pointer{position:absolute; top:-4px; left:50%; transform:translateX(-50%);
+  width:0;height:0;border-left:15px solid transparent;border-right:15px solid transparent;
+  border-top:28px solid var(--color-primary);
+  filter:drop-shadow(0 2px 5px rgba(0,0,0,.6)); z-index:3;}
+canvas{width:100%; height:100%; display:block;
+  transform:rotate(0deg);
+  transition:transform 4.6s cubic-bezier(.16,.84,.30,1);
+  filter:drop-shadow(0 8px 30px rgba(0,0,0,.45));}
+
+.controls{margin-top:18px; text-align:center;}
+.spin-btn{
+  width:100%; max-width:280px; border:none; cursor:pointer;
+  background:var(--color-primary); color:#0a0a0a; font-weight:700;
+  font-size:18px; padding:15px 0; border-radius:var(--r-full,1000px);
+  border-radius:999px; transition:background .15s, transform .05s;
+}
+.spin-btn:hover:not(:disabled){background:var(--color-primary-hover);}
+.spin-btn:active:not(:disabled){transform:scale(.98);}
+.spin-btn:disabled{background:var(--color-primary-disabled); color:var(--color-on-3); cursor:not-allowed;}
+
+.chips{display:flex; gap:10px; justify-content:center; margin-top:16px; flex-wrap:wrap;}
+.chip{background:var(--color-surface); border:1px solid var(--color-outline);
+  border-radius:999px; padding:8px 14px; font-size:13px; color:var(--color-on-2);}
+.chip b{color:var(--color-primary); font-size:15px; margin-left:4px;}
+.chip.warn b{color:var(--color-creator);}
+
+/* ── 紀錄 ── */
+.rec-head{display:flex; justify-content:space-between; align-items:baseline; margin-bottom:14px;}
+.rec-head h2{margin:0; font-size:18px; font-weight:700;}
+.rec-head .sub{font-size:12px; color:var(--color-on-3);}
+
+.totals{display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:16px;}
+.tot{background:var(--color-surface); border:1px solid var(--color-outline);
+  border-radius:var(--r-m); padding:12px; text-align:center;}
+.tot .label{font-size:11px; color:var(--color-on-3); display:block; margin-bottom:6px;}
+.tot .val{font-size:20px; font-weight:700; color:var(--color-on-1);}
+.tot.accent .val{color:var(--color-primary);}
+
+.table-scroll{max-height:420px; overflow-y:auto; border-radius:var(--r-m);}
+table{width:100%; border-collapse:collapse; font-size:14px;}
+thead th{position:sticky; top:0; background:var(--color-surface);
+  color:var(--color-on-3); font-weight:600; font-size:12px; text-align:left;
+  padding:10px 8px; border-bottom:1px solid var(--color-outline);}
+tbody td{padding:9px 8px; border-bottom:1px solid rgba(71,71,71,.4); vertical-align:middle;}
+tbody tr:last-child td{border-bottom:none;}
+td.no{color:var(--color-on-3); width:36px;}
+td.amt{font-weight:700; color:var(--color-primary); white-space:nowrap;}
+td.time{color:var(--color-on-2); font-variant-numeric:tabular-nums; white-space:nowrap; width:78px;}
+.note-input{width:100%; background:var(--color-surface); color:var(--color-on-1);
+  border:1px solid var(--color-outline); border-radius:var(--r-s);
+  padding:7px 9px; font-family:inherit; font-size:13px;}
+.note-input::placeholder{color:var(--color-on-3);}
+.note-input:focus{outline:none; border-color:var(--color-primary);}
+.empty{text-align:center; color:var(--color-on-3); padding:40px 0; font-size:13px;}
+
+.rec-actions{display:flex; gap:10px; margin-top:16px;}
+.btn-sm{flex:1; cursor:pointer; font-family:inherit; font-size:13px; font-weight:600;
+  padding:11px 0; border-radius:var(--r-s); background:transparent;
+  border:1px solid var(--color-outline); color:var(--color-on-2); transition:.15s;}
+.btn-sm:hover{border-color:var(--color-primary); color:var(--color-primary);}
+.btn-sm.danger:hover{border-color:#CF0404; color:#CF0404;}
+
+#export-area{display:none; margin-top:12px;}
+#export-area textarea{width:100%; height:120px; background:var(--color-surface);
+  color:var(--color-on-2); border:1px solid var(--color-outline); border-radius:var(--r-s);
+  padding:10px; font-family:ui-monospace,monospace; font-size:12px; resize:vertical;}
+#export-area .hint{font-size:11px; color:var(--color-on-3); margin:6px 0 0;}
+</style>
+</head>
+<body>
+<div class="page">
+  <header class="top">
+    <h1>現金轉盤抽獎</h1>
+    <p>獎金池總額 $12,000 ・ 共 13 個獎項，每轉一次抽出一個，抽完即發完</p>
+  </header>
+
+  <div class="wrap">
+    <!-- 左：轉盤 -->
+    <section class="panel">
+      <div class="stage">
+        <div class="pointer"></div>
+        <canvas id="wheel" width="800" height="800"></canvas>
+      </div>
+      <div class="controls">
+        <button class="spin-btn" id="spinBtn">開始抽獎</button>
+      </div>
+      <div class="chips">
+        <div class="chip">剩餘次數<b id="chipLeft">13</b></div>
+        <div class="chip warn">本次抽中<b id="chipLast">—</b></div>
+      </div>
+    </section>
+
+    <!-- 右：紀錄 -->
+    <section class="panel">
+      <div class="rec-head">
+        <h2>抽獎紀錄</h2>
+        <span class="sub">在「得獎者 / 備註」欄直接輸入</span>
+      </div>
+
+      <div class="totals">
+        <div class="tot"><span class="label">已抽次數</span><span class="val" id="totCount">0 / 13</span></div>
+        <div class="tot accent"><span class="label">已發出</span><span class="val" id="totGiven">$0</span></div>
+        <div class="tot"><span class="label">剩餘獎金</span><span class="val" id="totLeft">$12,000</span></div>
+      </div>
+
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr><th>#</th><th>中獎金額</th><th>時間</th><th>得獎者 / 備註</th></tr>
+          </thead>
+          <tbody id="recBody">
+            <tr><td colspan="4"><div class="empty">尚未開始抽獎</div></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="rec-actions">
+        <button class="btn-sm" id="exportBtn">匯出紀錄</button>
+        <button class="btn-sm danger" id="resetBtn">全部重設</button>
+      </div>
+
+      <div id="export-area">
+        <textarea id="exportText" readonly></textarea>
+        <p class="hint">已自動全選，按 Ctrl/⌘ + C 複製，可貼到 Excel / Google 試算表。</p>
+      </div>
+    </section>
+  </div>
+</div>
+
+<script>
+(function(){
+  // ── 設定：13 個獎項，總和 = 12000（如需調整金額，直接改這個陣列即可，但需維持 13 項、總和 12000）──
+  const PRIZES = [2000, 500, 1500, 600, 1000, 600, 1500, 500, 800, 600, 1000, 800, 600];
+  const N = PRIZES.length;
+  const TOTAL = PRIZES.reduce((a,b)=>a+b,0); // 12000
+  const COLORS = ['#00D2BE','#FFD100','#F6418D','#8238BA','#FF7200','#15EA48','#60C4E8','#FFA500'];
+
+  let claimed = new Array(N).fill(false);
+  let records = [];
+  let rotation = 0;
+  let spinning = false;
+
+  const cv = document.getElementById('wheel');
+  const ctx = cv.getContext('2d');
+  const btn = document.getElementById('spinBtn');
+
+  // ── 持久化（在 Claude 內可跨重整保留；下載/部署後自動降級為記憶體狀態）──
+  const Store = {
+    async save(){
+      try{ if(window.storage){ await window.storage.set('cash_wheel_v1', JSON.stringify({claimed,records,rotation}), false); } }catch(e){}
+    },
+    async load(){
+      try{ if(window.storage){ const r = await window.storage.get('cash_wheel_v1', false); if(r){ const s = JSON.parse(r.value); if(s && Array.isArray(s.claimed) && s.claimed.length===N){ claimed=s.claimed; records=s.records||[]; rotation=s.rotation||0; return true; } } } }catch(e){}
+      return false;
+    },
+    async clear(){ try{ if(window.storage){ await window.storage.delete('cash_wheel_v1', false); } }catch(e){} }
+  };
+
+  // ── 繪製轉盤 ──
+  function draw(){
+    const S = cv.width, cx=S/2, cy=S/2, r=S/2-10;
+    const seg = 2*Math.PI/N;
+    ctx.clearRect(0,0,S,S);
+    for(let i=0;i<N;i++){
+      const a0 = -Math.PI/2 + i*seg, a1 = a0+seg, mid = a0+seg/2;
+      ctx.beginPath(); ctx.moveTo(cx,cy); ctx.arc(cx,cy,r,a0,a1); ctx.closePath();
+      ctx.fillStyle = claimed[i] ? '#2a2a2a' : COLORS[i%COLORS.length];
+      ctx.fill();
+      ctx.lineWidth=3; ctx.strokeStyle='#191919'; ctx.stroke();
+      // 文字
+      ctx.save();
+      ctx.translate(cx,cy); ctx.rotate(mid);
+      ctx.fillStyle = claimed[i] ? '#646464' : '#191919';
+      ctx.font = "700 30px 'PingFang TC',sans-serif";
+      ctx.textBaseline='middle';
+      let norm = ((mid % (2*Math.PI)) + 2*Math.PI) % (2*Math.PI);
+      if(norm > Math.PI/2 && norm < 3*Math.PI/2){
+        ctx.rotate(Math.PI); ctx.textAlign='left'; ctx.fillText('$'+PRIZES[i], -(r-26), 0);
+      } else {
+        ctx.textAlign='right'; ctx.fillText('$'+PRIZES[i], r-26, 0);
+      }
+      ctx.restore();
+    }
+    // 中心
+    ctx.beginPath(); ctx.arc(cx,cy,52,0,2*Math.PI); ctx.fillStyle='#191919'; ctx.fill();
+    ctx.lineWidth=5; ctx.strokeStyle='#00D2BE'; ctx.stroke();
+    ctx.fillStyle='#00D2BE'; ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.font="700 24px 'PingFang TC',sans-serif"; ctx.fillText('SPIN', cx, cy);
+  }
+
+  function setRotation(deg, animate){
+    cv.style.transition = animate ? 'transform 4.6s cubic-bezier(.16,.84,.30,1)' : 'none';
+    cv.style.transform = 'rotate('+deg+'deg)';
+  }
+
+  function fmt(n){ return '$'+n.toLocaleString('en-US'); }
+
+  // ── 抽獎 ──
+  function spin(){
+    if(spinning) return;
+    const avail = [];
+    for(let i=0;i<N;i++) if(!claimed[i]) avail.push(i);
+    if(!avail.length) return;
+
+    spinning = true; btn.disabled = true; btn.textContent = '抽獎中…';
+    document.getElementById('chipLast').textContent = '—';
+
+    const k = avail[Math.floor(Math.random()*avail.length)];
+    const segDeg = 360/N;
+    const base = ((-(k*segDeg + segDeg/2)) % 360 + 360) % 360;
+    const newRotation = rotation + 360*6 + ((base - (rotation%360) + 360) % 360);
+    rotation = newRotation;
+
+    setRotation(rotation, true);
+
+    cv.addEventListener('transitionend', function handler(){
+      cv.removeEventListener('transitionend', handler);
+      claimed[k] = true;
+      const now = new Date();
+      records.push({
+        n: records.length+1,
+        amount: PRIZES[k],
+        time: now.toLocaleTimeString('zh-TW',{hour12:false}),
+        note:''
+      });
+      draw();
+      document.getElementById('chipLast').textContent = fmt(PRIZES[k]);
+      updateUI();
+      Store.save();
+      spinning = false;
+      if(claimed.every(Boolean)){
+        btn.disabled = true; btn.textContent = '已全部抽完';
+      } else {
+        btn.disabled = false; btn.textContent = '再抽一次';
+      }
+    }, {once:true});
+  }
+
+  // ── 更新文字統計 + 紀錄表 ──
+  function updateUI(){
+    const done = records.length;
+    const given = records.reduce((a,r)=>a+r.amount,0);
+    document.getElementById('chipLeft').textContent = N - done;
+    document.getElementById('totCount').textContent = done + ' / ' + N;
+    document.getElementById('totGiven').textContent = fmt(given);
+    document.getElementById('totLeft').textContent = fmt(TOTAL - given);
+
+    const tb = document.getElementById('recBody');
+    tb.innerHTML = '';
+    if(!records.length){
+      tb.innerHTML = '<tr><td colspan="4"><div class="empty">尚未開始抽獎</div></td></tr>';
+      return;
+    }
+    records.forEach((rec, idx)=>{
+      const tr = document.createElement('tr');
+      const tdNo = document.createElement('td'); tdNo.className='no'; tdNo.textContent = rec.n;
+      const tdAmt = document.createElement('td'); tdAmt.className='amt'; tdAmt.textContent = fmt(rec.amount);
+      const tdTime = document.createElement('td'); tdTime.className='time'; tdTime.textContent = rec.time;
+      const tdNote = document.createElement('td');
+      const inp = document.createElement('input');
+      inp.className='note-input'; inp.type='text'; inp.placeholder='輸入得獎者…';
+      inp.value = rec.note || '';
+      inp.addEventListener('input', ()=>{ records[idx].note = inp.value; Store.save(); });
+      tdNote.appendChild(inp);
+      tr.append(tdNo, tdAmt, tdTime, tdNote);
+      tb.appendChild(tr);
+    });
+  }
+
+  // ── 匯出 ──
+  function exportCSV(){
+    const area = document.getElementById('export-area');
+    const ta = document.getElementById('exportText');
+    let csv = '序號,中獎金額,時間,得獎者/備註\n';
+    records.forEach(r=>{ csv += [r.n, r.amount, r.time, '"'+(r.note||'').replace(/"/g,'""')+'"'].join(',') + '\n'; });
+    csv += ',,,\n合計,' + records.reduce((a,r)=>a+r.amount,0) + ',,';
+    ta.value = csv;
+    area.style.display = 'block';
+    ta.focus(); ta.select();
+  }
+
+  // ── 重設 ──
+  function reset(){
+    if(!confirm('確定要清除所有抽獎紀錄、重新開始嗎？')) return;
+    claimed = new Array(N).fill(false);
+    records = [];
+    rotation = 0;
+    spinning = false;
+    setRotation(0, false);
+    draw();
+    document.getElementById('chipLast').textContent = '—';
+    document.getElementById('export-area').style.display = 'none';
+    btn.disabled = false; btn.textContent = '開始抽獎';
+    updateUI();
+    Store.clear();
+  }
+
+  btn.addEventListener('click', spin);
+  document.getElementById('exportBtn').addEventListener('click', exportCSV);
+  document.getElementById('resetBtn').addEventListener('click', reset);
+
+  // ── 初始化（含還原狀態）──
+  (async function init(){
+    await Store.load();
+    setRotation(rotation, false);
+    draw();
+    updateUI();
+    if(records.length){
+      btn.textContent = claimed.every(Boolean) ? '已全部抽完' : '再抽一次';
+      btn.disabled = claimed.every(Boolean);
+      const last = records[records.length-1];
+      if(last) document.getElementById('chipLast').textContent = fmt(last.amount);
+    }
+  })();
+})();
+</script>
+</body>
+</html>

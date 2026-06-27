@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
+<style>
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; background:#0a0118; }
+  @keyframes bob { 0%,100%{ transform:translateX(-50%) translateY(0); } 50%{ transform:translateX(-50%) translateY(5px); } }
+  @keyframes titleGlow { 0%,100%{ text-shadow:0 0 8px rgba(255,45,184,.9),0 0 22px rgba(255,45,184,.6),0 0 40px rgba(34,211,238,.5); } 50%{ text-shadow:0 0 14px rgba(34,211,238,.95),0 0 30px rgba(255,45,184,.7),0 0 54px rgba(168,85,247,.6); } }
+  @keyframes rimPulse { 0%,100%{ filter:drop-shadow(0 0 6px rgba(255,225,77,.55)); } 50%{ filter:drop-shadow(0 0 16px rgba(255,225,77,.95)); } }
+  @keyframes popIn { 0%{ transform:scale(.82) translateY(14px); opacity:0; } 100%{ transform:scale(1) translateY(0); opacity:1; } }
+  @keyframes beat { 0%,100%{ transform:scale(1); } 50%{ transform:scale(1.12); } }
+  @keyframes floatBlob { 0%,100%{ transform:translate(0,0); } 50%{ transform:translate(24px,-30px); } }
+</style>
+</helmet>
+
+<div style="position:relative; min-height:100vh; width:100%; overflow:hidden; display:flex; flex-direction:column; align-items:center; padding:26px 18px 40px; font-family:'Noto Sans TC',sans-serif; background:radial-gradient(circle at 28% 14%, #34105e 0%, #160630 42%, #0a0118 78%);">
+
+  <div style="position:absolute; top:-80px; left:-60px; width:340px; height:340px; border-radius:50%; background:radial-gradient(circle,#ff2db8 0%,transparent 70%); opacity:.32; filter:blur(28px); animation:floatBlob 9s ease-in-out infinite; pointer-events:none;"></div>
+  <div style="position:absolute; bottom:-90px; right:-70px; width:380px; height:380px; border-radius:50%; background:radial-gradient(circle,#22d3ee 0%,transparent 70%); opacity:.28; filter:blur(32px); animation:floatBlob 11s ease-in-out infinite reverse; pointer-events:none;"></div>
+
+  <div style="position:relative; z-index:2; text-align:center; margin-bottom:6px;">
+    <div style="font-family:'Orbitron',sans-serif; font-size:13px; letter-spacing:7px; color:#22d3ee; font-weight:700; text-shadow:0 0 10px rgba(34,211,238,.7);">NEON KTV PARTY</div>
+    <h1 style="margin:6px 0 2px; font-size:clamp(30px,5.4vw,52px); font-weight:900; color:#fff; letter-spacing:2px; animation:titleGlow 3.2s ease-in-out infinite;">🎤 KTV 抽歌轉盤</h1>
+    <div style="font-size:clamp(13px,1.8vw,16px); color:#c9b6ff; font-weight:700;">轉一下，抽中熱門男女對唱！不想唱？跳舞 30 秒 🕺💃</div>
+  </div>
+
+  <div style="display:flex; flex-direction:column; align-items:center; gap:8px; margin:14px 0 4px; z-index:3;">
+    <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap; justify-content:center;">
+      <span style="font-size:13px; font-weight:900; color:#7d6aa8; letter-spacing:2px;">選分類</span>
+      <sc-for list="{{ categoryChips }}" as="chip" hint-placeholder-count="3">
+        <button onClick="{{ chip.onClick }}" style="padding:9px 18px; border:{{ chip.border }}; border-radius:999px; font-family:'Noto Sans TC',sans-serif; font-size:14px; font-weight:900; cursor:pointer; color:{{ chip.color }}; background:{{ chip.bg }}; transition:transform .15s;" style-hover="transform:translateY(-2px);">{{ chip.label }}</button>
+      </sc-for>
+    </div>
+    <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap; justify-content:center;">
+      <span style="font-size:13px; font-weight:900; color:#7d6aa8; letter-spacing:2px;">選外觀</span>
+      <sc-for list="{{ styleChips }}" as="chip" hint-placeholder-count="3">
+        <button onClick="{{ chip.onClick }}" style="padding:9px 18px; border:none; border-radius:999px; font-family:'Noto Sans TC',sans-serif; font-size:14px; font-weight:900; cursor:pointer; color:{{ chip.color }}; background:{{ chip.bg }}; box-shadow:0 4px 16px rgba(0,0,0,.4); transition:transform .15s;" style-hover="transform:translateY(-2px);">{{ chip.label }}</button>
+      </sc-for>
+    </div>
+  </div>
+
+  <div style="position:relative; width:min(82vw,540px); aspect-ratio:1/1; margin:8px 0 4px; z-index:2;">
+
+    <svg viewBox="-212 -212 424 424" style="position:absolute; inset:0; width:100%; height:100%; overflow:visible; animation:rimPulse 2.6s ease-in-out infinite;">
+      <circle cx="0" cy="0" r="200" fill="none" stroke="{{ rimColor }}" stroke-width="9" />
+      <sc-for list="{{ bulbs }}" as="b" hint-placeholder-count="24">
+        <circle cx="{{ b.bx }}" cy="{{ b.by }}" r="4.2" fill="{{ b.fill }}" />
+      </sc-for>
+    </svg>
+
+    <div style="position:absolute; inset:18px; transform:{{ wheelTransform }}; transition:transform 4.2s cubic-bezier(0.18,0.9,0.18,1); filter:drop-shadow(0 8px 26px rgba(0,0,0,.55));">
+      <svg viewBox="-188 -188 376 376" style="position:absolute; inset:0; width:100%; height:100%; display:block;">
+        <sc-for list="{{ segments }}" as="seg" hint-placeholder-count="16">
+          <path d="{{ seg.path }}" fill="{{ seg.fill }}" stroke="#0a0118" stroke-width="1.6" />
+        </sc-for>
+      </svg>
+      <div style="position:absolute; inset:0; pointer-events:none;">
+        <sc-for list="{{ segments }}" as="seg" hint-placeholder-count="16">
+          <div style="position:absolute; left:50%; top:50%; width:43%; height:24px; margin-top:-12px; transform-origin:left center; transform:{{ seg.rotate }}; display:flex; align-items:center; justify-content:flex-end; padding-right:7%; white-space:nowrap; color:{{ seg.textColor }}; font-size:{{ seg.fs }}px; font-weight:900; line-height:1; text-shadow:0 1px 2px rgba(0,0,0,.22);">{{ seg.label }}</div>
+        </sc-for>
+      </div>
+    </div>
+
+    <div style="position:absolute; top:-12px; left:50%; transform:translateX(-50%); width:0; height:0; border-left:18px solid transparent; border-right:18px solid transparent; border-top:34px solid #ffe14d; z-index:5; filter:drop-shadow(0 0 9px rgba(255,225,77,.95)); animation:bob 1.4s ease-in-out infinite;"></div>
+
+    <button onClick="{{ onSpin }}" disabled="{{ spinDisabled }}" style="position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); width:23%; aspect-ratio:1/1; border-radius:50%; border:4px solid #0a0118; cursor:pointer; font-family:'Orbitron',sans-serif; font-size:clamp(13px,2.4vw,20px); font-weight:900; color:#0a0118; letter-spacing:1px; background:radial-gradient(circle at 38% 32%, #fff 0%, #ffe14d 38%, #ff2db8 100%); box-shadow:0 0 0 6px rgba(255,255,255,.12), 0 6px 22px rgba(255,45,184,.6); z-index:6;">轉!</button>
+  </div>
+
+  <button onClick="{{ onSpin }}" disabled="{{ spinDisabled }}" style="margin-top:14px; z-index:3; padding:16px 46px; border:none; border-radius:999px; font-family:'Noto Sans TC',sans-serif; font-size:20px; font-weight:900; letter-spacing:2px; color:#0a0118; cursor:pointer; background:linear-gradient(135deg,#ffe14d,#ff2db8 55%,#22d3ee); box-shadow:0 8px 30px rgba(255,45,184,.5);">開始抽歌 🎶</button>
+
+  <!-- 抽中結果 -->
+  <sc-if value="{{ isResult }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed; inset:0; z-index:50; display:flex; align-items:center; justify-content:center; padding:20px; background:rgba(8,1,20,.82); backdrop-filter:blur(6px);">
+      <div style="width:min(440px,92vw); padding:32px 28px 26px; border-radius:26px; text-align:center; background:linear-gradient(160deg,#1c0a38,#120426); border:1.5px solid rgba(255,45,184,.55); box-shadow:0 0 50px rgba(255,45,184,.4),0 0 90px rgba(34,211,238,.18); animation:popIn .4s cubic-bezier(.2,1,.3,1);">
+        <div style="font-size:15px; letter-spacing:5px; color:#22d3ee; font-weight:900;">🎉 你抽到了 🎉</div>
+        <div style="font-size:clamp(30px,7vw,46px); font-weight:900; color:#fff; margin:12px 0 4px; line-height:1.15; text-shadow:0 0 16px rgba(255,45,184,.7);">{{ chosenTitle }}</div>
+        <div style="font-size:17px; color:#d9c8ff; font-weight:700; margin-bottom:10px;">{{ chosenArtists }}</div>
+        <sc-if value="{{ chosenIsDuet }}" hint-placeholder-val="{{ false }}">
+          <div style="display:inline-block; padding:5px 16px; border-radius:999px; font-size:13px; font-weight:900; color:#0a0118; background:linear-gradient(135deg,#ffe14d,#22d3ee); margin-bottom:18px;">👫 男女對唱</div>
+        </sc-if>
+        <div style="display:flex; flex-direction:column; gap:11px; margin-top:8px;">
+          <button onClick="{{ onAccept }}" style="padding:16px; border:none; border-radius:15px; font-family:'Noto Sans TC',sans-serif; font-size:18px; font-weight:900; color:#0a0118; cursor:pointer; background:linear-gradient(135deg,#ffe14d,#ff2db8); box-shadow:0 6px 20px rgba(255,45,184,.45);">🎤 接受挑戰，開唱！</button>
+          <button onClick="{{ onDance }}" style="padding:16px; border:none; border-radius:15px; font-family:'Noto Sans TC',sans-serif; font-size:18px; font-weight:900; color:#fff; cursor:pointer; background:linear-gradient(135deg,#7c3aed,#22d3ee); box-shadow:0 6px 20px rgba(34,211,238,.4);">💃 放棄開唱 → 跳舞挑戰</button>
+          <button onClick="{{ onSkip }}" style="padding:13px; border:1.5px solid rgba(255,255,255,.22); border-radius:15px; font-family:'Noto Sans TC',sans-serif; font-size:15px; font-weight:700; color:#b9a8e0; cursor:pointer; background:transparent;">✕ 不挑戰這一個，離開</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- 接受開唱 -->
+  <sc-if value="{{ isAccepted }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed; inset:0; z-index:50; display:flex; align-items:center; justify-content:center; padding:20px; background:rgba(8,1,20,.86); backdrop-filter:blur(6px);">
+      <div style="width:min(440px,92vw); padding:40px 28px 30px; border-radius:26px; text-align:center; background:linear-gradient(160deg,#2a0a4a,#120426); border:1.5px solid rgba(255,225,77,.5); box-shadow:0 0 60px rgba(255,225,77,.35); animation:popIn .4s cubic-bezier(.2,1,.3,1);">
+        <div style="font-size:60px; animation:beat 1s ease-in-out infinite;">🎤</div>
+        <div style="font-size:clamp(28px,6vw,40px); font-weight:900; color:#ffe14d; margin:8px 0 6px; text-shadow:0 0 18px rgba(255,225,77,.7);">開唱囉！</div>
+        <div style="font-size:clamp(22px,5vw,32px); font-weight:900; color:#fff; line-height:1.2;">{{ chosenTitle }}</div>
+        <div style="font-size:16px; color:#d9c8ff; font-weight:700; margin:6px 0 22px;">{{ chosenArtists }}</div>
+        <button onClick="{{ onBack }}" style="padding:14px 40px; border:none; border-radius:14px; font-family:'Noto Sans TC',sans-serif; font-size:17px; font-weight:900; color:#0a0118; cursor:pointer; background:linear-gradient(135deg,#ffe14d,#22d3ee);">唱完了，回轉盤</button>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- 跳舞挑戰（直接錄影核對） -->
+  <sc-if value="{{ isDancing }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed; inset:0; z-index:50; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:24px; text-align:center; background:radial-gradient(circle at 50% 38%,#3a0a5e,#0a0118 75%); animation:popIn .35s ease;">
+      <div style="font-size:clamp(60px,16vw,104px); line-height:1; animation:beat 1s ease-in-out infinite;">🕺💃</div>
+      <div style="font-size:clamp(28px,6.4vw,46px); font-weight:900; color:#22d3ee; letter-spacing:1px; margin:14px 0 4px; text-shadow:0 0 18px rgba(34,211,238,.7);">跳舞挑戰開始！</div>
+      <div style="font-size:clamp(15px,2.4vw,19px); color:#d9c8ff; font-weight:700;">放棄開唱，那就熱舞一段吧 🎶</div>
+
+      <div style="max-width:420px; padding:20px 24px; border-radius:18px; background:rgba(255,45,184,.12); border:1.5px solid rgba(255,45,184,.45); margin:24px 0; box-shadow:0 0 36px rgba(255,45,184,.18);">
+        <div style="font-size:clamp(19px,3vw,23px); font-weight:900; color:#fff;">📹 記得全程錄影！</div>
+        <div style="font-size:clamp(14px,2.2vw,16px); color:#ffd6f0; font-weight:700; margin-top:8px; line-height:1.5;">跳完後，把錄影畫面拿來<br>找我們核對就能核銷 🎁</div>
+      </div>
+
+      <button onClick="{{ onBack }}" style="padding:16px 48px; border:none; border-radius:14px; font-family:'Noto Sans TC',sans-serif; font-size:18px; font-weight:900; color:#0a0118; cursor:pointer; background:linear-gradient(135deg,#22d3ee,#ffe14d); box-shadow:0 8px 26px rgba(34,211,238,.4);">跳完了，回轉盤</button>
+    </div>
+  </sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{
+  &quot;$preview&quot;: { &quot;width&quot;: 1180, &quot;height&quot;: 880 },
+  &quot;wheelStyle&quot;: { &quot;editor&quot;: &quot;enum&quot;, &quot;options&quot;: [&quot;neon&quot;,&quot;rainbow&quot;,&quot;vinyl&quot;], &quot;default&quot;: &quot;neon&quot;, &quot;tsType&quot;: &quot;string&quot; }
+}">
+class Component extends DCLogic {
+  constructor(props){
+    super(props);
+    this.songs = [
+      // 男女對唱
+      { t:'屋頂',         a:'周杰倫 & 溫嵐',   d:true,  tags:['duet','hot','y2000'] },
+      { t:'廣島之戀',     a:'莫文蔚 & 張洪量', d:true,  tags:['duet','hot','y1990'] },
+      { t:'小酒窩',       a:'林俊傑 & 蔡卓妍', d:true,  tags:['duet','hot','y2000'] },
+      { t:'今天你要嫁給我', a:'陶喆 & 蔡依林',  d:true,  tags:['duet','hot','y2000'] },
+      { t:'因為愛情',     a:'王菲 & 陳奕迅',   d:true,  tags:['duet','hot'] },
+      { t:'選擇',         a:'葉蒨文 & 林子祥', d:true,  tags:['duet','hot','y1990'] },
+      { t:'珊瑚海',       a:'周杰倫 & Lara',   d:true,  tags:['duet','y2000'] },
+      // 經典台語（含對唱）
+      { t:'流浪到淡水',   a:'金門王 & 李炳輝', d:true,  tags:['tai','duet','hot'] },
+      { t:'一支小雨傘',   a:'洪榮宏 & 方瑞娥', d:true,  tags:['tai','duet'] },
+      { t:'家後',         a:'江蕙',           d:false, tags:['tai','hot'] },
+      { t:'愛拼才會贏',   a:'葉啟田',         d:false, tags:['tai','hot'] },
+      { t:'落雨聲',       a:'江蕙',           d:false, tags:['tai'] },
+      { t:'浪子的心情',   a:'葉啟田',         d:false, tags:['tai'] },
+      // 2000 年代熱門
+      { t:'江南',         a:'林俊傑',         d:false, tags:['hot','y2000'] },
+      { t:'隱形的翅膀',   a:'張韶涵',         d:false, tags:['hot','y2000'] },
+      { t:'七里香',       a:'周杰倫',         d:false, tags:['hot','y2000'] },
+      { t:'寧夏',         a:'梁靜茹',         d:false, tags:['y2000'] },
+      // 1990 年代經典
+      { t:'我願意',       a:'王菲',           d:false, tags:['hot','y1990'] },
+      { t:'聽海',         a:'張惠妹',         d:false, tags:['hot','y1990'] },
+      { t:'吻別',         a:'張學友',         d:false, tags:['hot','y1990'] },
+      { t:'心太軟',       a:'任賢齊',         d:false, tags:['y1990'] },
+      { t:'領悟',         a:'辛曉琪',         d:false, tags:['y1990'] },
+    ];
+    this.styleDefs = [
+      { id:'neon', label:'霓虹' },
+      { id:'rainbow', label:'派對彩虹' },
+      { id:'vinyl', label:'黑膠' },
+    ];
+    this.categoryDefs = [
+      { id:'all',   label:'全部 🎶' },
+      { id:'duet',  label:'男女對唱 👫' },
+      { id:'hot',   label:'熱門曲目 🔥' },
+      { id:'y2000', label:'2000 年代' },
+      { id:'y1990', label:'1990 年代' },
+      { id:'tai',   label:'經典台語 🎙️' },
+    ];
+    this.state = {
+      rotation: 0,
+      spinning: false,
+      screen: 'idle',
+      chosen: null,
+      wheelStyle: props.wheelStyle || 'neon',
+      category: 'all',
+    };
+  }
+
+  filteredSongs(){
+    const c = this.state.category;
+    if (c === 'all') return this.songs;
+    return this.songs.filter(s => s.tags.indexOf(c) !== -1);
+  }
+
+  point(deg, r){
+    const rad = deg * Math.PI / 180;
+    return [ r * Math.sin(rad), -r * Math.cos(rad) ];
+  }
+
+  segFill(i, style){
+    if (style === 'neon')   return ['#ff2db8','#22d3ee','#a855f7','#ffe14d'][i % 4];
+    if (style === 'rainbow') return 'hsl(' + Math.round(i * 360 / this.songs.length) + ' 85% 62%)';
+    return i % 2 === 0 ? '#1b1b29' : '#27273c';
+  }
+
+  buildSegments(){
+    const style = this.state.wheelStyle;
+    const list = this.filteredSongs();
+    const R = 180;
+    const n = list.length;
+    const seg = 360 / n;
+    const out = [];
+    for (let i = 0; i < n; i++){
+      const t0 = i * seg, t1 = (i + 1) * seg;
+      const [x0,y0] = this.point(t0, R);
+      const [x1,y1] = this.point(t1, R);
+      const path = 'M 0 0 L ' + x0.toFixed(2) + ' ' + y0.toFixed(2) + ' A ' + R + ' ' + R + ' 0 0 1 ' + x1.toFixed(2) + ' ' + y1.toFixed(2) + ' Z';
+      const mid = i * seg + seg / 2;
+      const title = list[i].t;
+      const L = title.length;
+      const fs = n <= 8  ? (L <= 3 ? 22 : L <= 5 ? 18 : 15)
+               : n <= 12 ? (L <= 3 ? 18 : L <= 5 ? 15 : 12.5)
+               : n <= 16 ? (L <= 3 ? 16 : L <= 5 ? 13 : 11)
+               :           (L <= 4 ? 12 : 10.5);
+      out.push({
+        path,
+        fill: this.segFill(i, style),
+        label: title,
+        rotate: 'rotate(' + (mid - 90).toFixed(2) + 'deg)',
+        fs,
+        textColor: style === 'vinyl' ? '#ece8ff' : '#16002b',
+      });
+    }
+    return out;
+  }
+
+  buildBulbs(){
+    const n = 24, r = 200, out = [];
+    for (let i = 0; i < n; i++){
+      const [bx,by] = this.point(i * 360 / n, r);
+      out.push({ bx: bx.toFixed(2), by: by.toFixed(2), fill: i % 2 ? '#ff2db8' : '#22d3ee' });
+    }
+    return out;
+  }
+
+  setStyle(id){ this.setState({ wheelStyle: id }); }
+
+  setCategory(id){
+    if (this.state.spinning) return;
+    this.setState({ category: id });
+  }
+
+  spin(){
+    if (this.state.spinning) return;
+    const list = this.filteredSongs();
+    const n = list.length;
+    const seg = 360 / n;
+    const idx = Math.floor(Math.random() * n);
+    const mid = idx * seg + seg / 2;
+    const jitter = (Math.random() * 0.6 - 0.3) * seg;
+    const base = this.state.rotation;
+    const currentMod = ((base % 360) + 360) % 360;
+    let targetMod = ((((-mid - jitter) % 360) + 360) % 360);
+    let delta = targetMod - currentMod;
+    if (delta < 0) delta += 360;
+    const newRot = base + 360 * 6 + delta;
+    this.setState({ spinning: true, rotation: newRot, screen: 'idle', chosen: null });
+    clearTimeout(this._t);
+    this._t = setTimeout(() => {
+      this.setState({ spinning: false, chosen: list[idx], screen: 'result' });
+    }, 4300);
+  }
+
+  dance(){
+    this.setState({ screen: 'dancing' });
+  }
+
+  backToWheel(){
+    this.setState({ screen: 'idle', chosen: null });
+  }
+
+  componentWillUnmount(){ clearTimeout(this._t); }
+
+  renderVals(){
+    return {
+      segments: this.buildSegments(),
+      bulbs: this.buildBulbs(),
+      wheelTransform: 'rotate(' + this.state.rotation + 'deg)',
+      spinDisabled: this.state.spinning,
+      onSpin: () => this.spin(),
+      styleChips: this.styleDefs.map(dd => ({
+        id: dd.id,
+        label: dd.label,
+        active: dd.id === this.state.wheelStyle,
+        bg: dd.id === this.state.wheelStyle ? 'linear-gradient(135deg,#ff2db8,#22d3ee)' : 'rgba(255,255,255,0.06)',
+        color: dd.id === this.state.wheelStyle ? '#0a0118' : '#cbb8ff',
+        onClick: () => this.setStyle(dd.id),
+      })),
+      categoryChips: this.categoryDefs.map(cc => ({
+        id: cc.id,
+        label: cc.label,
+        active: cc.id === this.state.category,
+        bg: cc.id === this.state.category ? 'linear-gradient(135deg,#ffe14d,#ff2db8)' : 'rgba(255,255,255,0.05)',
+        color: cc.id === this.state.category ? '#0a0118' : '#ffd6f0',
+        border: cc.id === this.state.category ? 'none' : '1.5px solid rgba(255,45,184,.4)',
+        onClick: () => this.setCategory(cc.id),
+      })),
+      isResult: this.state.screen === 'result',
+      isAccepted: this.state.screen === 'accepted',
+      isDancing: this.state.screen === 'dancing',
+      chosenTitle: this.state.chosen ? this.state.chosen.t : '',
+      chosenArtists: this.state.chosen ? this.state.chosen.a : '',
+      chosenIsDuet: this.state.chosen ? this.state.chosen.d : false,
+      onAccept: () => this.setState({ screen: 'accepted' }),
+      onDance: () => this.dance(),
+      onSkip: () => this.backToWheel(),
+      onBack: () => this.backToWheel(),
+      rimColor: this.state.wheelStyle === 'vinyl' ? '#d4af37' : this.state.wheelStyle === 'rainbow' ? '#ffffff' : '#ffe14d',
+    };
+  }
+}
+</script>
+</body>
+</html>

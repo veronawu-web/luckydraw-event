@@ -226,8 +226,16 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:rgba(2
         <span class="tx"><span id="t3-tx"></span><br /><span class="st" id="t3-st">尚未達成</span></span>
       </div>
 
-      <div class="menu"><h5 id="food-h">主食</h5><div id="food-opts"></div><p class="locked-note" id="food-note">連 1 線後開放選擇。</p></div>
-      <div class="menu"><h5 id="drink-h">飲品</h5><div id="drink-opts"></div><p class="locked-note" id="drink-note">連 2 線後開放選擇。</p></div>
+      <div class="menu"><h5 id="food-h">主食</h5><div id="food-opts"></div>
+        <div class="btn-row hide" id="food-confirm-row" style="margin-top:4px">
+          <button class="btn mini" id="btn-food-confirm" type="button">確認送出主食</button>
+        </div>
+        <p class="locked-note" id="food-note">連 1 線後開放選擇。</p></div>
+      <div class="menu"><h5 id="drink-h">飲品</h5><div id="drink-opts"></div>
+        <div class="btn-row hide" id="drink-confirm-row" style="margin-top:4px">
+          <button class="btn mini" id="btn-drink-confirm" type="button">確認送出飲品</button>
+        </div>
+        <p class="locked-note" id="drink-note">連 2 線後開放選擇。</p></div>
       <div class="menu">
         <h5>向主辦許願（選填）</h5>
         <div style="display:flex;gap:8px;align-items:center">
@@ -267,10 +275,12 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:rgba(2
         <div class="team" style="gap:6px;margin-bottom:8px">
           <span style="flex:1 1 100%;font-size:13px" id="ops-food-t">主食：—</span>
           <button class="btn ghost mini" id="btn-food-done">核銷出餐</button>
+          <button class="btn ghost mini" id="btn-food-redo">解鎖重選</button>
         </div>
         <div class="team" style="gap:6px">
           <span style="flex:1 1 100%;font-size:13px" id="ops-drink-t">飲品：—</span>
           <button class="btn ghost mini" id="btn-drink-done">核銷出餐</button>
+          <button class="btn ghost mini" id="btn-drink-redo">解鎖重選</button>
         </div>
 
         <div id="ops-red" style="margin-top:14px">
@@ -634,6 +644,7 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:rgba(2
     tasks:BANK_DUO.slice(0,9),
     hits:[false,false,false,false,false,false,false,false,false],
     locked:false, food:"", drink:"", wish:"", firstAll:false,
+    foodPend:"", drinkPend:"",            // 用戶暫選、還沒按「確認送出」
     foodDone:"", drinkDone:"",            // 出餐核銷時間（HH:MM）
     red:[{amt:0,at:""},{amt:0,at:""},{amt:0,at:""}],   // 連1線／連2線／全連 的紅包
     startedAt:"", device:""
@@ -666,6 +677,8 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:rgba(2
       if(typeof o.food==="string") S.food=o.food;
       if(typeof o.drink==="string") S.drink=o.drink;
       if(typeof o.wish==="string") S.wish=o.wish;
+      if(typeof o.foodPend==="string") S.foodPend=o.foodPend;
+      if(typeof o.drinkPend==="string") S.drinkPend=o.drinkPend;
       if(typeof o.foodDone==="string") S.foodDone=o.foodDone;
       if(typeof o.drinkDone==="string") S.drinkDone=o.drinkDone;
       if(Array.isArray(o.red)&&o.red.length===3) S.red=o.red.map(function(r){
@@ -1044,8 +1057,16 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:rgba(2
   function bindMenus(){
     document.addEventListener("change", function(e){
       var t=e.target; if(!t) return;
-      if(t.name==="food"){ S.food=t.value; save(); render(); syncSoon(); toast("主食已登記："+t.value); }
-      if(t.name==="drink"){ S.drink=t.value; save(); render(); syncSoon(); toast("飲品已登記："+t.value); }
+      if(t.name==="food"){
+        if(S.food){ toast("主食已送單，要改請找工作人員"); render(); return; }
+        S.foodPend=t.value; save(); render();
+        toast("已選："+t.value+"，按「確認送出主食」才會送單");
+      }
+      if(t.name==="drink"){
+        if(S.drink){ toast("飲品已送單，要改請找工作人員"); render(); return; }
+        S.drinkPend=t.value; save(); render();
+        toast("已選："+t.value+"，按「確認送出飲品」才會送單");
+      }
     });
     $("in-wish").addEventListener("input", function(){
       $("wish-note").textContent="尚未送出 —— 寫好後按「送出」，主辦才收得到。";
@@ -1137,6 +1158,48 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:rgba(2
     S.drinkDone=hhmm(); save(); render(); syncNow(true); toast("飲品已核銷出餐");
   });
 
+  function confirmMeal(kind){
+    var isFood = kind==="food";
+    var label  = isFood ? "主食" : "飲品";
+    var pend   = isFood ? S.foodPend : S.drinkPend;
+    if(isFood ? S.food : S.drink){ toast(label+"已送單"); return; }
+    if(!pend){ toast("請先選一個"+label); return; }
+    ask({
+      title:"送出"+label,
+      body:"「"+pend+"」\n\n送出後用戶不能再自行更改。請工作人員輸入核銷碼確認。",
+      input:true, placeholder:"核銷碼", ok:"送出"
+    }, function(ok,val){
+      if(!ok) return;
+      if(String(val).trim()!==STAFF_CODE){ toast("核銷碼不正確，尚未送單"); return; }
+      if(isFood){ S.food=pend; S.foodPend=""; } else { S.drink=pend; S.drinkPend=""; }
+      save(); render(); syncNow(true);
+      toast(label+"已送單："+pend);
+    });
+  }
+  $("btn-food-confirm").addEventListener("click", function(){ confirmMeal("food"); });
+  $("btn-drink-confirm").addEventListener("click", function(){ confirmMeal("drink"); });
+
+  function redoMeal(kind){
+    var isFood = kind==="food";
+    var label = isFood ? "主食" : "飲品";
+    var cur = isFood ? S.food : S.drink;
+    var done = isFood ? S.foodDone : S.drinkDone;
+    if(!cur){ toast(label+"還沒選，不用解鎖"); return; }
+    ask({
+      title:"解鎖"+label+"重選？",
+      body:"目前："+cur+(done ? "（已出餐 "+done+"）" : "（未出餐）")+
+           "\n\n解鎖後用戶可以重新選一次，"+(done ? "出餐核銷也會一併清掉，請確認廚房那邊的處理。" : "原本的選擇會被清掉。"),
+      ok:"解鎖重選"
+    }, function(ok){
+      if(!ok) return;
+      if(isFood){ S.food=""; S.foodDone=""; S.foodPend=""; } else { S.drink=""; S.drinkDone=""; S.drinkPend=""; }
+      save(); render(); syncNow(true);
+      toast(label+"已解鎖，用戶可以重選");
+    });
+  }
+  $("btn-food-redo").addEventListener("click", function(){ redoMeal("food"); });
+  $("btn-drink-redo").addEventListener("click", function(){ redoMeal("drink"); });
+
   // 長按取消餐點核銷（誤按用）
   (function(){
     function bindUndo(id, key, label){
@@ -1221,6 +1284,7 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:rgba(2
       S={mode:"duo",user:"",host:"",type:"preset",tasks:BANK_DUO.slice(0,9),
          hits:[false,false,false,false,false,false,false,false,false],
          locked:false,food:"",drink:"",wish:"",firstAll:false,
+         foodPend:"",drinkPend:"",
          foodDone:"",drinkDone:"",red:[{amt:0,at:""},{amt:0,at:""},{amt:0,at:""}],
          startedAt:"",device:deviceId()};
       setStaffPanel(false);
@@ -1343,14 +1407,14 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:rgba(2
     $("t3").classList.toggle("on",hits===9);
     var r1=Number(S.red[0].amt||0), r2=Number(S.red[1].amt||0), r3=Number(S.red[2].amt||0);
     $("t1-st").textContent = lines>=1
-      ? (S.food ? ("已選："+S.food + (S.foodDone?"・已出餐 "+S.foodDone:"・待出餐")
+      ? (S.food ? ("已送單："+S.food + (S.foodDone?"・已出餐 "+S.foodDone:"・待出餐")
                   + (!solo && r1>0 ? "・紅包 "+fmtAmt(r1)+" "+RED_UNIT : ""))
-                : "已達成・待選主食")
+                : (S.foodPend ? "已選："+S.foodPend+"・待確認送出" : "已達成・待選主食"))
       : "尚未達成";
     $("t2-st").textContent = lines>=2
-      ? (S.drink ? ("已選："+S.drink + (S.drinkDone?"・已出餐 "+S.drinkDone:"・待出餐")
+      ? (S.drink ? ("已送單："+S.drink + (S.drinkDone?"・已出餐 "+S.drinkDone:"・待出餐")
                     + (!solo && r2>0 ? "・紅包 "+fmtAmt(r2)+" "+RED_UNIT : ""))
-                 : "已達成・待選飲品")
+                 : (S.drinkPend ? "已選："+S.drinkPend+"・待確認送出" : "已達成・待選飲品"))
       : "尚未達成";
     $("t3-st").textContent = hits===9
       ? (solo ? "已完成全部 9 格"
@@ -1366,13 +1430,29 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:rgba(2
     $("drink-h").textContent="飲品 "+DRINK.length+" 選 1";
     $("s-red-k").textContent = solo ? "已解鎖餐點" : "可抽紅包";
     $("s-red").textContent = solo ? countMeals() : red;
-    buildMenu("food-opts",FOOD,"food",S.food,lines>=1);
-    buildMenu("drink-opts",DRINK,"drink",S.drink,lines>=2);
-    $("food-note").textContent  = lines>=1 ? "已開放。選好後由主播／工作人員向櫃檯下單。" : "連 1 線後開放選擇。";
-    $("drink-note").textContent = lines>=2 ? "已開放。選好後由主播／工作人員向櫃檯下單。" : "連 2 線後開放選擇。";
+    buildMenu("food-opts", FOOD, "food",  S.food || S.foodPend,  lines>=1 && !S.food);
+    buildMenu("drink-opts",DRINK,"drink", S.drink || S.drinkPend, lines>=2 && !S.drink);
+
+    $("food-confirm-row").classList.toggle("hide", !(lines>=1 && !S.food));
+    $("btn-food-confirm").disabled = !S.foodPend;
+    $("drink-confirm-row").classList.toggle("hide", !(lines>=2 && !S.drink));
+    $("btn-drink-confirm").disabled = !S.drinkPend;
+
+    $("food-note").textContent = S.food
+      ? (S.foodDone ? "已出餐 "+S.foodDone+"。已送單，不能更改。" : "已送單，不能自行更改。要改請找工作人員。")
+      : (lines>=1 ? (S.foodPend ? "選好了嗎？按「確認送出主食」，由工作人員輸入核銷碼才送單。"
+                                : "已開放。選一個，然後按「確認送出主食」。")
+                  : "連 1 線後開放選擇。");
+    $("drink-note").textContent = S.drink
+      ? (S.drinkDone ? "已出餐 "+S.drinkDone+"。已送單，不能更改。" : "已送單，不能自行更改。要改請找工作人員。")
+      : (lines>=2 ? (S.drinkPend ? "選好了嗎？按「確認送出飲品」，由工作人員輸入核銷碼才送單。"
+                                 : "已開放。選一個，然後按「確認送出飲品」。")
+                  : "連 2 線後開放選擇。");
     // 工作人員面板：餐點與紅包
-    $("ops-food-t").textContent  = "主食：" + (S.food || "—") + (S.foodDone ? "　✅ 已出餐 "+S.foodDone : "");
-    $("ops-drink-t").textContent = "飲品：" + (S.drink || "—") + (S.drinkDone ? "　✅ 已出餐 "+S.drinkDone : "");
+    $("ops-food-t").textContent  = "主食：" + (S.food || (S.foodPend ? S.foodPend+"（用戶暫選，未送單）" : "—"))
+                                   + (S.foodDone ? "　✅ 已出餐 "+S.foodDone : "");
+    $("ops-drink-t").textContent = "飲品：" + (S.drink || (S.drinkPend ? S.drinkPend+"（用戶暫選，未送單）" : "—"))
+                                   + (S.drinkDone ? "　✅ 已出餐 "+S.drinkDone : "");
     $("ops-red").classList.toggle("hide", solo);
     if(!solo){
       var labels=["紅包 1（連 1 線）","紅包 2（連 2 線）","紅包 3（全連）"], tot=0;

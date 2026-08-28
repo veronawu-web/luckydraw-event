@@ -182,11 +182,8 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:rgba(2
       <p class="hint">選好的順序就是格子順序（1→9）。選滿 9 題才能鎖卡。</p>
     </div>
 
-    <div class="btn-row">
-      <button class="btn" id="btn-lock">鎖定卡片・開始遊戲</button>
-      <button class="btn ghost mini" id="btn-restore-2">已經玩過了？從後台還原進度</button>
-    </div>
-    <p class="hint">鎖卡後任務不可改（工作人員可解鎖）。進度存這台裝置，重整不會消失，並會自動回傳後台。<br />用戶誤關網頁或換裝置時，用上面的「從後台還原進度」＋帳號即可接回。</p>
+    <div class="btn-row"><button class="btn" id="btn-lock">鎖定卡片・開始遊戲</button></div>
+    <p class="hint">鎖卡後任務不可改。進度存這台裝置，重整不會消失。</p>
   </section>
 
   <!-- ===== STEP 2 ===== -->
@@ -204,7 +201,7 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:rgba(2
       <div class="stats">
         <div class="stat"><div class="n" id="s-cell">0<span style="font-size:13px;color:var(--on-dark-3)">/9</span></div><div class="k">已蓋章</div></div>
         <div class="stat"><div class="n" id="s-line">0</div><div class="k">連線數</div></div>
-        <div class="stat"><div class="n" id="s-red">0</div><div class="k">可抽紅包</div></div>
+        <div class="stat"><div class="n" id="s-red">0</div><div class="k" id="s-red-k">可抽紅包</div></div>
       </div>
     </div>
 
@@ -218,23 +215,52 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:rgba(2
       <div class="sec-t"><h2>連線獎勵</h2><span class="lat">rewards</span></div>
       <div class="tier" id="t1">
         <span class="tag">連 1 線</span>
-        <span class="tx"><b>選 1 份主食（5 選 1）</b> ＋抽紅包 ×1<br /><span class="st" id="t1-st">尚未達成</span></span>
+        <span class="tx"><span id="t1-tx"></span><br /><span class="st" id="t1-st">尚未達成</span></span>
       </div>
       <div class="tier" id="t2">
         <span class="tag">連 2 線</span>
-        <span class="tx"><b>選 1 樣飲品（3 選 1）</b> ＋抽紅包 ×1<br /><span class="st" id="t2-st">尚未達成</span></span>
+        <span class="tx"><span id="t2-tx"></span><br /><span class="st" id="t2-st">尚未達成</span></span>
       </div>
       <div class="tier" id="t3">
         <span class="tag">全連 9 格</span>
-        <span class="tx"><b>第一名 5,000 點餐額度</b> ＋抽紅包 ×1<br /><span class="st" id="t3-st">尚未達成</span></span>
+        <span class="tx"><span id="t3-tx"></span><br /><span class="st" id="t3-st">尚未達成</span></span>
       </div>
 
-      <div class="menu"><h5>主食 5 選 1</h5><div id="food-opts"></div><p class="locked-note" id="food-note">連 1 線後開放選擇。</p></div>
-      <div class="menu"><h5>飲品 3 選 1</h5><div id="drink-opts"></div><p class="locked-note" id="drink-note">連 2 線後開放選擇。</p></div>
-      <div class="menu"><h5>向主辦許願（選填）</h5><input class="inp" id="in-wish" type="text" maxlength="60" placeholder="想吃想喝的、或任何想說的話" /></div>
+      <div class="menu"><h5 id="food-h">主食</h5><div id="food-opts"></div><p class="locked-note" id="food-note">連 1 線後開放選擇。</p></div>
+      <div class="menu"><h5 id="drink-h">飲品</h5><div id="drink-opts"></div><p class="locked-note" id="drink-note">連 2 線後開放選擇。</p></div>
+      <div class="menu">
+        <h5>向主辦許願（選填）</h5>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input class="inp" id="in-wish" type="text" maxlength="60" placeholder="想吃想喝的、或任何想說的話" style="flex:1" />
+          <button class="btn mini" id="btn-wish" type="button" style="flex:0 0 auto">送出</button>
+        </div>
+        <p class="locked-note" id="wish-note">寫好後按「送出」，主辦才收得到。</p>
+      </div>
     </div>
 
-    <div class="card">
+
+    <div class="card hide" id="cta-card">
+      <div class="sec-t"><h2 id="cta-h">下一步</h2><span class="lat">next up</span></div>
+
+      <div id="cta-line" class="hide" style="text-align:center">
+        <p style="font-family:var(--cjk);font-size:15px;font-weight:600;margin:0 0 4px" id="cta-line-t"></p>
+        <p class="hint" style="margin:0 0 12px" id="cta-line-n"></p>
+        <div id="qr-box" style="display:inline-block;background:#fff;padding:12px;border-radius:12px"></div>
+        <div class="btn-row" style="justify-content:center">
+          <a class="btn mini" id="cta-line-btn" href="#" target="_blank" rel="noopener">直接開啟 LINE</a>
+        </div>
+      </div>
+
+      <div id="cta-site" class="hide" style="margin-top:14px;padding-top:14px;border-top:1px dashed rgba(247,232,230,.18)">
+        <p style="font-family:var(--cjk);font-size:14px;font-weight:600;margin:0 0 4px" id="cta-site-t"></p>
+        <p class="hint" style="margin:0 0 10px" id="cta-site-n"></p>
+        <a class="btn ghost mini" id="cta-site-btn" href="#" target="_blank" rel="noopener">看其他活動</a>
+      </div>
+    </div>
+
+  </section>
+
+    <div class="card hide" id="staff-card">
       <div class="sec-t"><h2>工作人員</h2><span class="lat">staff only</span></div>
       <div class="btn-row">
         <button class="btn ghost mini" id="btn-sync">立即同步後台</button>
@@ -242,13 +268,12 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:rgba(2
         <button class="btn ghost mini" id="btn-summary">結算摘要</button>
         <button class="btn ghost mini" id="btn-unlock">解鎖卡片</button>
         <button class="btn ghost mini" id="btn-reset">換下一位（清除本機）</button>
+        <button class="btn ghost mini" id="btn-staff-close">關閉此面板</button>
       </div>
-      <p class="hint"><b>每一格核銷都要現場碼</b>，預設 <code>0829</code>（檔案內 <code>STAFF_CODE</code>）。若嫌一格一格輸入太慢，把 <code>STAFF_SESSION_SEC</code> 改成 120，輸入一次後 120 秒內可連續核銷。<br />後台網址填在 <code>GAS_URL</code>；沒填就是「只存本機」，斷網時會存成待送佇列，恢復後自動補送。</p>
+      <p class="hint">此面板只有輸入現場碼才會出現，用戶端看不到。<br />開啟方式：<b>長按頁尾那行 SWAG 字樣 1.2 秒</b> → 輸入現場碼。離開時按「關閉此面板」。</p>
     </div>
 
-  </section>
-
-  <p class="foot">SWAG · 8 月女神聚會 · oncor 信義店 · 8/29（六）</p>
+  <p class="foot" id="staff-gate">SWAG · 8 月女神聚會 · oncor 信義店 · 8/29（六）</p>
 </div>
 
 <div class="sticky hide" id="sticky">
@@ -276,6 +301,212 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:rgba(2
 (function(){
   "use strict";
 
+  /* ===== QR 產生器（自寫，離線可用；EC M，version 1–10）===== */
+  /* 精簡 QR 產生器：byte mode、EC level M、version 1–10 自動選擇
+     輸出 boolean[][]（true = 黑）。純自寫，無外部相依。 */
+  function qrMatrix(text){
+    "use strict";
+  
+    // ── UTF-8 bytes
+    var data=[], i;
+    var enc=unescape(encodeURIComponent(text));
+    for(i=0;i<enc.length;i++) data.push(enc.charCodeAt(i)&0xff);
+  
+    // ── 版本表（EC M）：[總碼字, EC每塊碼字, 群組1塊數, 群組1資料碼字, 群組2塊數, 群組2資料碼字]
+    var VER = {
+      1:[26,10,1,16,0,0],   2:[44,16,1,28,0,0],   3:[70,26,1,44,0,0],
+      4:[100,18,2,32,0,0],  5:[134,24,2,43,0,0],  6:[172,16,4,27,0,0],
+      7:[196,18,4,31,0,0],  8:[242,22,2,38,2,39], 9:[292,22,3,36,2,37],
+      10:[346,26,4,43,1,44]
+    };
+    function dataCw(v){ var t=VER[v]; return t[2]*t[3]+t[4]*t[5]; }
+  
+    // ── 選版本
+    var version=0;
+    for(var v=1;v<=10;v++){
+      var cc = v<10 ? 8 : 16;
+      var need = Math.ceil((4+cc+data.length*8)/8);
+      if(need<=dataCw(v)){ version=v; break; }
+    }
+    if(!version) throw new Error("QR: 內容太長（超過 version 10）");
+  
+    // ── bit stream
+    var bits=[];
+    function put(val,len){ for(var k=len-1;k>=0;k--) bits.push((val>>>k)&1); }
+    put(4,4);
+    put(data.length, version<10?8:16);
+    for(i=0;i<data.length;i++) put(data[i],8);
+    var cap=dataCw(version)*8;
+    for(i=0;i<4 && bits.length<cap;i++) bits.push(0);
+    while(bits.length%8) bits.push(0);
+    var bytes=[];
+    for(i=0;i<bits.length;i+=8){
+      var b=0; for(var j=0;j<8;j++) b=(b<<1)|bits[i+j];
+      bytes.push(b);
+    }
+    var pad=[0xEC,0x11], pi=0;
+    while(bytes.length<dataCw(version)) bytes.push(pad[pi++%2]);
+  
+    // ── GF(256)
+    var EXP=new Array(512), LOG=new Array(256), x=1;
+    for(i=0;i<255;i++){ EXP[i]=x; LOG[x]=i; x<<=1; if(x&0x100) x^=0x11d; }
+    for(i=255;i<512;i++) EXP[i]=EXP[i-255];
+    function mul(a,b){ return (a===0||b===0)?0:EXP[LOG[a]+LOG[b]]; }
+    function rsPoly(n){
+      var p=[1];
+      for(var k=0;k<n;k++){
+        var np=new Array(p.length+1); for(i=0;i<np.length;i++) np[i]=0;
+        for(i=0;i<p.length;i++){ np[i]^=mul(p[i],1); np[i+1]^=mul(p[i],EXP[k]); }
+        p=np;
+      }
+      return p;
+    }
+    function ecc(block,n){
+      var g=rsPoly(n), res=block.concat(new Array(n).fill(0));
+      for(i=0;i<block.length;i++){
+        var f=res[i]; if(f===0) continue;
+        for(var k=0;k<g.length;k++) res[i+k]^=mul(g[k],f);
+      }
+      return res.slice(block.length);
+    }
+  
+    // ── 分塊 ＋ 交錯
+    var t=VER[version], ecLen=t[1];
+    var blocks=[], p=0, bi;
+    for(bi=0;bi<t[2];bi++){ blocks.push(bytes.slice(p,p+t[3])); p+=t[3]; }
+    for(bi=0;bi<t[4];bi++){ blocks.push(bytes.slice(p,p+t[5])); p+=t[5]; }
+    var eccs=blocks.map(function(b){ return ecc(b,ecLen); });
+    var maxLen=Math.max.apply(null, blocks.map(function(b){return b.length;}));
+    var final=[];
+    for(i=0;i<maxLen;i++) for(bi=0;bi<blocks.length;bi++) if(i<blocks[bi].length) final.push(blocks[bi][i]);
+    for(i=0;i<ecLen;i++) for(bi=0;bi<eccs.length;bi++) final.push(eccs[bi][i]);
+  
+    // ── 矩陣
+    var size=version*4+17;
+    var m=[], reserved=[];
+    for(i=0;i<size;i++){ m.push(new Array(size).fill(null)); reserved.push(new Array(size).fill(false)); }
+  
+    function setF(r,c,val){ if(r<0||c<0||r>=size||c>=size) return; m[r][c]=val; reserved[r][c]=true; }
+    function finder(r,c){
+      for(var dr=-1;dr<=7;dr++) for(var dc=-1;dc<=7;dc++){
+        var rr=r+dr, cc=c+dc;
+        if(rr<0||cc<0||rr>=size||cc>=size) continue;
+        var on = (dr>=0&&dr<=6&&(dc===0||dc===6)) || (dc>=0&&dc<=6&&(dr===0||dr===6)) ||
+                 (dr>=2&&dr<=4&&dc>=2&&dc<=4);
+        setF(rr,cc,on?1:0);
+      }
+    }
+    finder(0,0); finder(0,size-7); finder(size-7,0);
+  
+    for(i=8;i<size-8;i++){ setF(6,i,i%2===0?1:0); setF(i,6,i%2===0?1:0); }
+  
+    var AL={1:[],2:[6,18],3:[6,22],4:[6,26],5:[6,30],6:[6,34],
+            7:[6,22,38],8:[6,24,42],9:[6,26,46],10:[6,28,50]};
+    var al=AL[version];
+    for(var a=0;a<al.length;a++) for(var b2=0;b2<al.length;b2++){
+      var ar=al[a], ac=al[b2];
+      if((ar===6&&ac===6)||(ar===6&&ac===size-7)||(ar===size-7&&ac===6)) continue;
+      for(var dr2=-2;dr2<=2;dr2++) for(var dc2=-2;dc2<=2;dc2++){
+        var on2 = Math.max(Math.abs(dr2),Math.abs(dc2))!==1;
+        setF(ar+dr2, ac+dc2, on2?1:0);
+      }
+    }
+  
+    setF(size-8,8,1);                       // dark module
+    for(i=0;i<9;i++){ if(m[8][i]===null) setF(8,i,0); if(m[i][8]===null) setF(i,8,0); }
+    for(i=0;i<8;i++){ if(m[8][size-1-i]===null) setF(8,size-1-i,0); if(m[size-1-i][8]===null) setF(size-1-i,8,0); }
+  
+    // ── 放資料（zigzag，右下往上）
+    var dbits=[];
+    for(i=0;i<final.length;i++) for(var k2=7;k2>=0;k2--) dbits.push((final[i]>>>k2)&1);
+    var idx=0, up=true;
+    for(var col=size-1;col>0;col-=2){
+      if(col===6) col--;
+      for(var rowI=0;rowI<size;rowI++){
+        var row = up ? size-1-rowI : rowI;
+        for(var cOff=0;cOff<2;cOff++){
+          var cc2=col-cOff;
+          if(reserved[row][cc2]) continue;
+          m[row][cc2] = idx<dbits.length ? dbits[idx++] : 0;
+        }
+      }
+      up=!up;
+    }
+  
+    // ── mask + 格式資訊
+    function maskFn(k,r,c){
+      switch(k){
+        case 0: return (r+c)%2===0;
+        case 1: return r%2===0;
+        case 2: return c%3===0;
+        case 3: return (r+c)%3===0;
+        case 4: return (Math.floor(r/2)+Math.floor(c/3))%2===0;
+        case 5: return ((r*c)%2)+((r*c)%3)===0;
+        case 6: return (((r*c)%2)+((r*c)%3))%2===0;
+        case 7: return (((r+c)%2)+((r*c)%3))%2===0;
+      }
+    }
+    function applyMask(k){
+      var out=[];
+      for(var r=0;r<size;r++){
+        out.push([]);
+        for(var c=0;c<size;c++){
+          var val=m[r][c];
+          if(!reserved[r][c] && maskFn(k,r,c)) val=val^1;
+          out[r].push(val);
+        }
+      }
+      return out;
+    }
+    function fmtBits(k){
+      var fmt=(0x00<<3)|k;                 // EC level M = 00
+      var d=fmt<<10;
+      var g=0x537;
+      for(var b3=14;b3>=10;b3--) if((d>>>b3)&1) d^=g<<(b3-10);
+      return ((fmt<<10)|d)^0x5412;
+    }
+    function placeFmt(mat,k){
+      var f=fmtBits(k), n=size;
+      // 位置順序＝bit14 → bit0（由實測 reference 矩陣導出）
+      var P1=[[8,0],[8,1],[8,2],[8,3],[8,4],[8,5],[8,7],[8,8],[7,8],[5,8],[4,8],[3,8],[2,8],[1,8],[0,8]];
+      var P2=[[n-1,8],[n-2,8],[n-3,8],[n-4,8],[n-5,8],[n-6,8],[n-7,8],
+              [8,n-8],[8,n-7],[8,n-6],[8,n-5],[8,n-4],[8,n-3],[8,n-2],[8,n-1]];
+      for(var q=0;q<15;q++){
+        var bit=(f>>>(14-q))&1;
+        mat[P1[q][0]][P1[q][1]]=bit;
+        mat[P2[q][0]][P2[q][1]]=bit;
+      }
+      mat[n-8][8]=1;   // dark module
+      return mat;
+    }
+    function penalty(mat){
+      var s=0,r,c,run,i2;
+      for(r=0;r<size;r++){ run=1; for(c=1;c<size;c++){ if(mat[r][c]===mat[r][c-1]) run++; else { if(run>=5) s+=3+(run-5); run=1; } } if(run>=5) s+=3+(run-5); }
+      for(c=0;c<size;c++){ run=1; for(r=1;r<size;r++){ if(mat[r][c]===mat[r-1][c]) run++; else { if(run>=5) s+=3+(run-5); run=1; } } if(run>=5) s+=3+(run-5); }
+      for(r=0;r<size-1;r++) for(c=0;c<size-1;c++){
+        var vv=mat[r][c];
+        if(vv===mat[r][c+1]&&vv===mat[r+1][c]&&vv===mat[r+1][c+1]) s+=3;
+      }
+      var pat1=[1,0,1,1,1,0,1,0,0,0,0], pat2=[0,0,0,0,1,0,1,1,1,0,1];
+      function seq(arr,pat){ var n=0; for(var q=0;q+pat.length<=arr.length;q++){ var okk=true; for(var w=0;w<pat.length;w++) if(arr[q+w]!==pat[w]){okk=false;break;} if(okk) n++; } return n; }
+      for(r=0;r<size;r++){ var rowArr=mat[r]; s+=40*(seq(rowArr,pat1)+seq(rowArr,pat2)); }
+      for(c=0;c<size;c++){ var colArr=[]; for(r=0;r<size;r++) colArr.push(mat[r][c]); s+=40*(seq(colArr,pat1)+seq(colArr,pat2)); }
+      var dark=0; for(r=0;r<size;r++) for(c=0;c<size;c++) if(mat[r][c]) dark++;
+      var pct=dark*100/(size*size);
+      s+=10*Math.floor(Math.abs(pct-50)/5);
+      return s;
+    }
+  
+    var best=null, bestScore=Infinity;
+    for(var k3=0;k3<8;k3++){
+      var cand=placeFmt(applyMask(k3),k3);
+      var sc=penalty(cand);
+      if(sc<bestScore){ bestScore=sc; best=cand; }
+    }
+    return best.map(function(row){ return row.map(function(vv){ return !!vv; }); });
+  }
+
+
   /* ============================================================
      ① 上線前要改的三個常數
      ============================================================ */
@@ -287,7 +518,7 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:rgba(2
   var STAFF_SESSION_SEC = 0;
 
   // Google Apps Script 部署網址（/exec 結尾）。留空＝只存本機、不回傳。
-  var GAS_URL = "https://script.google.com/macros/s/AKfycbzbRqxAR6ehgiP_Mx-7tB1EEjSP6vWBRbuYu_Qm_81UmgRhmUCxlZ-djK-fOd7fqc7URw/exec";
+  var GAS_URL = "";
 
   // 這台裝置的代號（多台平板時方便對帳，可留空自動產生）
   var DEVICE_ID = "";
@@ -344,8 +575,16 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:rgba(2
     "無伴奏清唱 4 句，讓旁邊的人猜歌名"
   ];
 
-  var FOOD = ["麻辣燙和牛牛肉麵","大紅袍炭香紅燒牛肉麵","韓式碳烤帶骨牛小排包生菜","韓式醬烤豬五花包生菜","蒜香和牛炒飯"];
-  var DRINK = ["山崎焙煎樽梅酒","西班牙金星啤酒（750ml）","日式清酒蛤蠣湯 ×2"];
+  var FOOD = ["麻辣燙和牛牛肉麵","大紅袍炭香紅燒牛肉麵","蒜香和牛炒飯"];
+  var DRINK = ["山崎焙煎樽梅酒","西班牙金星啤酒（750ml）"];
+
+  // ── CTA：填了才會出現。QR 由頁面自己畫，現場沒網路也掃得到
+  var LINE_URL   = "";                       // 活動 LINE@ 加入連結
+  var LINE_TITLE = "加入活動 LINE@ 送 2,000 鑽石";
+  var LINE_NOTE  = "掃描 QR code 加入，出示加入畫面給工作人員即可領取";
+  var SITE_URL   = "";                       // 站內其他活動連結
+  var SITE_TITLE = "站內還有其他活動進行中";
+  var SITE_NOTE  = "點開看看目前開放的活動與獎勵";
 
   var LINES = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
   var STORE_KEY = "swag_bingo_0829_v2";
@@ -425,7 +664,8 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:rgba(2
       hits:S.hits.map(function(b){ return b?1:0; }),
       stamps:hits,
       lines:lines,
-      redEnvelopes:(lines>=1?1:0)+(lines>=2?1:0)+(hits===9?1:0),
+      redEnvelopes:countRed(),
+      mealsUnlocked:countMeals(),
       food:S.food, drink:S.drink, wish:S.wish,
       fullHouse:hits===9?1:0,
       startedAt:S.startedAt,
@@ -507,6 +747,13 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:rgba(2
   function countHits(){ var n=0; for(var i=0;i<9;i++) if(S.hits[i]) n++; return n; }
   function countLines(){ var n=0; for(var i=0;i<LINES.length;i++){ var L=LINES[i]; if(S.hits[L[0]]&&S.hits[L[1]]&&S.hits[L[2]]) n++; } return n; }
   function stampsLeft(){ return 9-countHits(); }
+  // 單人闖關沒有抽紅包，只解鎖餐點
+  function countRed(){
+    if(S.mode==="solo") return 0;
+    var l=countLines(), h=countHits();
+    return (l>=1?1:0)+(l>=2?1:0)+(h===9?1:0);
+  }
+  function countMeals(){ var l=countLines(); return (l>=1?1:0)+(l>=2?1:0); }
   function presetFor(mode){ return bank(mode).slice(0,9); }
 
   var toastT=null;
@@ -657,10 +904,10 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:rgba(2
       save(); render();
       if(isLast) syncNow(true); else syncSoon();
       var after=countLines();
-      if(isLast) toast("全連完成！請登記第一名與 5,000 點餐額度");
+      if(isLast) toast(S.mode==="solo" ? "全連完成！所有任務都達成了" : "全連完成！請登記第一名與 5,000 點餐額度");
       else if(after>before){
-        if(after===1) toast("連 1 線！可選 1 份主食 ＋ 抽紅包 ×1");
-        else if(after===2) toast("連 2 線！可選 1 樣飲品 ＋ 抽紅包 ×1");
+        if(after===1) toast("連 1 線！可選 1 份主食"+(S.mode==="solo"?"":" ＋ 抽紅包 ×1"));
+        else if(after===2) toast("連 2 線！可選 1 樣飲品"+(S.mode==="solo"?"":" ＋ 抽紅包 ×1"));
         else toast("目前 "+after+" 線");
       }else toast("第 "+(i+1)+" 格已核銷");
     }
@@ -743,7 +990,16 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:rgba(2
       if(t.name==="food"){ S.food=t.value; save(); render(); syncSoon(); toast("主食已登記："+t.value); }
       if(t.name==="drink"){ S.drink=t.value; save(); render(); syncSoon(); toast("飲品已登記："+t.value); }
     });
-    $("in-wish").addEventListener("input", function(){ S.wish=this.value; save(); syncSoon(); });
+    $("in-wish").addEventListener("input", function(){
+      $("wish-note").textContent="尚未送出 —— 寫好後按「送出」，主辦才收得到。";
+    });
+    $("btn-wish").addEventListener("click", function(){
+      var v=$("in-wish").value.trim();
+      if(!v){ toast("先寫點什麼再送出"); return; }
+      S.wish=v; save(); syncNow(true);
+      $("wish-note").textContent="已送出："+v;
+      toast("許願已送出，謝謝！");
+    });
   }
 
   /* ============================================================
@@ -778,6 +1034,39 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:rgba(2
       .catch(function(){ cb(false,"連不到後台，請檢查 GAS 部署權限（需「任何人」可存取）"); });
   }
 
+  // ── 工作人員面板：預設隱藏，長按頁尾 1.2 秒 ＋ 現場碼才開
+  var staffPanel=false;
+  function setStaffPanel(v){
+    staffPanel=!!v;
+    $("staff-card").classList.toggle("hide", !staffPanel);
+  }
+  (function bindStaffGate(){
+    var t=null;
+    var gate=$("staff-gate");
+    function start(){
+      if(t) clearTimeout(t);
+      t=setTimeout(function(){
+        if(staffPanel){ toast("工作人員面板已開啟"); return; }
+        ask({title:"工作人員面板", body:"請輸入現場碼。", input:true, placeholder:"現場碼", ok:"開啟"},
+        function(ok,val){
+          if(!ok) return;
+          if(String(val).trim()!==STAFF_CODE){ toast("現場碼不正確"); return; }
+          setStaffPanel(true); render();
+          toast(S.locked ? "工作人員面板已開啟" : "現場碼正確，鎖卡後即可使用面板");
+        });
+      },1200);
+    }
+    function stop(){ if(t){ clearTimeout(t); t=null; } }
+    gate.addEventListener("pointerdown", start);
+    gate.addEventListener("pointerup", stop);
+    gate.addEventListener("pointerleave", stop);
+    gate.addEventListener("contextmenu", function(e){ e.preventDefault(); });
+  })();
+
+  $("btn-staff-close").addEventListener("click", function(){
+    setStaffPanel(false); toast("面板已關閉，可交給用戶");
+  });
+
   function onRestoreClick(){
     if(!GAS_URL){ toast("尚未填入 GAS_URL"); return; }
     ask({title:"從後台還原進度", body:"用戶不小心關掉網頁、或換了一台裝置時使用。輸入用戶帳號，會把後台最新一筆拉回這台裝置。",
@@ -790,9 +1079,9 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:rgba(2
     });
   }
   $("btn-restore").addEventListener("click", onRestoreClick);
-  $("btn-restore-2").addEventListener("click", onRestoreClick);
 
   $("btn-unlock").addEventListener("click", function(){
+    if(!S.locked){ toast("目前就是未鎖卡狀態"); return; }
     ask({title:"解鎖卡片？", body:"解鎖後可修改報到資料與任務，已蓋的章會保留。",
          input:true, placeholder:"現場碼", ok:"解鎖"}, function(ok,val){
       if(!ok) return;
@@ -812,13 +1101,15 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:rgba(2
       S={mode:"duo",user:"",host:"",type:"preset",tasks:BANK_DUO.slice(0,9),
          hits:[false,false,false,false,false,false,false,false,false],
          locked:false,food:"",drink:"",wish:"",firstAll:false,startedAt:"",device:deviceId()};
-      save(); render(); toast("已清除，可交給下一位");
+      setStaffPanel(false);
+      save(); render(); toast("已清除，面板已關閉，可交給下一位");
     });
   });
 
   $("btn-summary").addEventListener("click", function(){
+    if(!S.locked){ toast("這台裝置目前沒有進行中的卡片"); return; }
     var hits=countHits(), lines=countLines();
-    var red=(lines>=1?1:0)+(lines>=2?1:0)+(hits===9?1:0);
+    var red=countRed(), solo=S.mode==="solo";
     var q=queueRead().length;
     var txt=
       "【女神點唱 BINGO 結算】8/29 oncor\n"+
@@ -828,8 +1119,8 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:rgba(2
       "蓋章："+hits+"/9　連線："+lines+" 線\n"+
       "主食："+(S.food||"—")+"\n"+
       "飲品："+(S.drink||"—")+"\n"+
-      "可抽紅包："+red+" 次\n"+
-      "全連："+(hits===9?"是（需登記是否第一名／5,000 點餐額度）":"否")+"\n"+
+      (solo ? "已解鎖餐點："+countMeals()+" 項\n" : "可抽紅包："+red+" 次\n")+
+      "全連："+(hits===9?(solo?"是（單人軌）":"是（需登記是否第一名／5,000 點餐額度）"):"否")+"\n"+
       "許願："+(S.wish||"—")+"\n"+
       "裝置："+deviceId()+"　待送佇列："+q+" 筆";
     ask({title:"結算摘要", body:txt, ok:"複製"}, function(ok){
@@ -844,16 +1135,57 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:rgba(2
   });
 
   /* ============================================================
+     CTA：LINE@ QR ＋ 站內活動
+     ============================================================ */
+  function drawQR(box, text, px){
+    box.innerHTML="";
+    var mat;
+    try{ mat=qrMatrix(text); }
+    catch(e){ box.innerHTML='<span style="color:#C0344F;font-size:12px">QR 產生失敗：'+esc(e.message)+'</span>'; return; }
+    var n=mat.length, quiet=4, total=n+quiet*2;
+    var scale=Math.max(2, Math.floor((px||240)/total));
+    var cv=document.createElement("canvas");
+    cv.width=cv.height=total*scale;
+    cv.style.width=cv.style.height=(total*scale)+"px";
+    cv.setAttribute("aria-label","QR code");
+    var g=cv.getContext("2d");
+    g.fillStyle="#fff"; g.fillRect(0,0,cv.width,cv.height);
+    g.fillStyle="#0D090B";
+    for(var r=0;r<n;r++) for(var c=0;c<n;c++) if(mat[r][c])
+      g.fillRect((c+quiet)*scale,(r+quiet)*scale,scale,scale);
+    box.appendChild(cv);
+  }
+
+  var ctaDrawn=false;
+  function buildCTA(){
+    var hasLine=!!LINE_URL, hasSite=!!SITE_URL;
+    $("cta-card").classList.toggle("hide", !(hasLine||hasSite));
+    $("cta-line").classList.toggle("hide", !hasLine);
+    $("cta-site").classList.toggle("hide", !hasSite);
+    if(hasLine){
+      $("cta-line-t").textContent=LINE_TITLE;
+      $("cta-line-n").textContent=LINE_NOTE;
+      $("cta-line-btn").href=LINE_URL;
+      if(!ctaDrawn){ drawQR($("qr-box"), LINE_URL, 220); ctaDrawn=true; }
+    }
+    if(hasSite){
+      $("cta-site-t").textContent=SITE_TITLE;
+      $("cta-site-n").textContent=SITE_NOTE;
+      $("cta-site-btn").href=SITE_URL;
+    }
+  }
+
+  /* ============================================================
      render
      ============================================================ */
   function render(){
     var hits=countHits(), lines=countLines();
-    var red=(lines>=1?1:0)+(lines>=2?1:0)+(hits===9?1:0);
-    var solo=S.mode==="solo";
+    var red=countRed(), solo=S.mode==="solo";
 
     $("setup").classList.toggle("hide",S.locked);
     $("game").classList.toggle("hide",!S.locked);
     $("sticky").classList.toggle("hide",!S.locked);
+    $("staff-card").classList.toggle("hide", !staffPanel);
 
     if(!S.locked){
       $("in-user").value=S.user; $("in-host").value=S.host;
@@ -878,7 +1210,6 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:rgba(2
 
     $("s-cell").innerHTML=hits+'<span style="font-size:13px;color:var(--on-dark-3)">/9</span>';
     $("s-line").textContent=lines;
-    $("s-red").textContent=red;
     $("prog").textContent=hits+" / 9 格 · "+lines+" 線";
 
     buildGrid();
@@ -888,13 +1219,26 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:rgba(2
     $("t3").classList.toggle("on",hits===9);
     $("t1-st").textContent = lines>=1 ? (S.food?"已選："+S.food:"已達成・待選主食") : "尚未達成";
     $("t2-st").textContent = lines>=2 ? (S.drink?"已選："+S.drink:"已達成・待選飲品") : "尚未達成";
-    $("t3-st").textContent = hits===9 ? "已全連・請工作人員登記第一名與 5,000 點餐額度" : "尚未達成";
+    $("t3-st").textContent = hits===9
+      ? (solo ? "已完成全部 9 格" : "已全連・請工作人員登記第一名與 5,000 點餐額度")
+      : "尚未達成";
 
+    var rTail = solo ? "" : " ＋抽紅包 ×1";
+    $("t1-tx").innerHTML = "<b>選 1 份主食（"+FOOD.length+" 選 1）</b>"+rTail;
+    $("t2-tx").innerHTML = "<b>選 1 樣飲品（"+DRINK.length+" 選 1）</b>"+rTail;
+    $("t3-tx").innerHTML = solo ? "<b>完成全部 9 格</b> 餐點全部解鎖"
+                                : "<b>第一名 5,000 點餐額度</b> ＋抽紅包 ×1";
+    $("food-h").textContent="主食 "+FOOD.length+" 選 1";
+    $("drink-h").textContent="飲品 "+DRINK.length+" 選 1";
+    $("s-red-k").textContent = solo ? "已解鎖餐點" : "可抽紅包";
+    $("s-red").textContent = solo ? countMeals() : red;
     buildMenu("food-opts",FOOD,"food",S.food,lines>=1);
     buildMenu("drink-opts",DRINK,"drink",S.drink,lines>=2);
     $("food-note").textContent  = lines>=1 ? "已開放。選好後由主播／工作人員向櫃檯下單。" : "連 1 線後開放選擇。";
     $("drink-note").textContent = lines>=2 ? "已開放。選好後由主播／工作人員向櫃檯下單。" : "連 2 線後開放選擇。";
     $("in-wish").value=S.wish;
+    $("wish-note").textContent = S.wish ? ("已送出："+S.wish) : "寫好後按「送出」，主辦才收得到。";
+    buildCTA();
   }
 
   /* ============================================================

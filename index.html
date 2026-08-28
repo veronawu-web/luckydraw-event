@@ -2,7 +2,7 @@
 <html lang="zh-Hant">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover, interactive-widget=resizes-content" />
 <title>女神點唱 BINGO · 8月場｜SWAG</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -21,12 +21,15 @@
   --maxw:520px;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;padding:0}
+html,body{margin:0;padding:0;width:100%;max-width:100%;overflow-x:hidden;overscroll-behavior-y:none}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+body.modal-open{position:fixed;left:0;right:0;overflow:hidden}
 body{
   background:
     radial-gradient(120% 60% at 50% 0%, #4a1526 0%, rgba(74,21,38,0) 60%),
     linear-gradient(180deg,#160A10 0%, var(--ink-black) 45%, #14090E 100%);
-  color:var(--on-dark); font-family:var(--sans); min-height:100vh; -webkit-text-size-adjust:100%;
+  color:var(--on-dark); font-family:var(--sans);
+  min-height:100vh; min-height:100dvh; -webkit-text-size-adjust:100%;
 }
 .wrap{max-width:var(--maxw);margin:0 auto;padding:0 16px 140px}
 
@@ -46,7 +49,7 @@ h1{font-family:var(--cjk);font-weight:600;font-size:26px;letter-spacing:.06em;ma
 .card.paper .sec-t .lat{color:var(--paper-ink-2)}
 .lbl{display:block;font-family:var(--cond);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--on-dark-3);margin:0 0 6px}
 .hint{font-size:12px;color:var(--on-dark-2);line-height:1.65;margin:8px 0 0}
-.inp{width:100%;padding:11px 12px;border-radius:9px;font:inherit;font-size:15px;
+.inp{width:100%;padding:11px 12px;border-radius:9px;font:inherit;font-size:16px;
   background:rgba(13,9,11,.5);border:1px solid rgba(247,232,230,.2);color:var(--on-dark)}
 .card.paper .inp{background:#fff;border-color:rgba(58,16,29,.2);color:var(--paper-ink)}
 .inp:focus{outline:2px solid var(--hot);outline-offset:1px}
@@ -117,7 +120,7 @@ h1{font-family:var(--cjk);font-weight:600;font-size:26px;letter-spacing:.06em;ma
 .ops-line+.ops-line{margin-top:7px}
 .ops-name{flex:1 1 100%;font-size:13px}
 .ops-tag{font-family:var(--cond);font-size:11px;letter-spacing:.06em;color:var(--on-dark-3);flex:0 0 auto}
-.ops-inp{flex:1 1 90px;min-width:80px;padding:8px 10px;font-size:15px;text-align:right}
+.ops-inp{flex:1 1 90px;min-width:80px;padding:9px 10px;font-size:16px;text-align:right}
 .ops-unit{font-size:12px;color:var(--on-dark-3);flex:0 0 auto}
 .ops-money.saved .ops-inp{border-color:rgba(79,183,131,.55)}
 .money-badge{display:flex;align-items:baseline;justify-content:space-between;gap:8px;
@@ -128,14 +131,47 @@ h1{font-family:var(--cjk);font-weight:600;font-size:26px;letter-spacing:.06em;ma
 .money-badge .v{font-family:var(--cond);font-size:20px;font-weight:600;color:#8a5a12;letter-spacing:.02em}
 .money-badge .b{font-size:11px;color:#a8783a}
 
+/* 側邊浮動列 */
+.rail{position:fixed;right:0;top:50%;transform:translateY(-50%);z-index:45;
+  display:flex;flex-direction:column;gap:8px;pointer-events:none}
+.rail.hide{display:none}
+.rail a{pointer-events:auto;text-decoration:none}
+.rail-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
+  width:60px;padding:10px 6px;border:0;cursor:pointer;
+  border-radius:14px 0 0 14px;box-shadow:-3px 0 14px rgba(0,0,0,.35);
+  font-family:var(--sans);line-height:1.25;text-align:center}
+.rail-btn .ic{font-size:17px;line-height:1}
+.rail-btn .tx{font-size:9.5px;letter-spacing:.02em}
+.rail-btn .tx b{display:block;font-size:11px;font-weight:700}
+.rail-btn.line{background:linear-gradient(180deg,#06C755,#04a948);color:#fff}
+.rail-btn.site{background:linear-gradient(180deg,var(--hot),#c92e73);color:#fff}
+.rail-btn:active{transform:translateX(2px)}
+@media (max-width:640px){
+  body.rail-on .wrap{padding-right:70px}
+  body.rail-on .sticky .in{padding-right:56px}
+}
+@media (max-width:360px){
+  .rail-btn{width:52px;padding:9px 4px}
+  .rail-btn .tx{font-size:9px}
+  .rail-btn .tx b{font-size:10px}
+}
+
 .toast{position:fixed;left:50%;bottom:96px;transform:translateX(-50%) translateY(12px);
   background:rgba(13,9,11,.94);border:1px solid rgba(247,232,230,.2);color:var(--on-dark);
   padding:11px 16px;border-radius:999px;font-size:13px;z-index:60;opacity:0;pointer-events:none;
   transition:opacity .2s ease, transform .2s ease;max-width:88vw;text-align:center}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-dialog{border:0;padding:0;background:transparent;max-width:400px;width:calc(100% - 32px)}
-dialog::backdrop{background:rgba(9,5,7,.72)}
+dialog{
+  border:0;padding:0;background:transparent;
+  position:fixed;inset:0;width:100%;height:100%;max-width:100%;max-height:100%;
+  display:none;align-items:center;justify-content:center;
+}
+dialog[open]{display:flex}
+dialog::backdrop{background:rgba(9,5,7,.78)}
+.modal{width:min(400px, calc(100vw - 32px));max-height:calc(100dvh - 32px);overflow-y:auto;
+  -webkit-overflow-scrolling:touch}
 .modal{background:#F9EFEC;color:var(--paper-ink);border-radius:14px;padding:20px}
+.modal .inp{font-size:16px}
 .modal h3{font-family:var(--cjk);font-size:17px;margin:0 0 8px}
 .modal p{font-size:13.5px;line-height:1.7;margin:0 0 14px;color:var(--paper-ink-2);white-space:pre-wrap}
 .modal .inp{margin-bottom:12px;background:#fff;border-color:rgba(58,16,29,.2);color:var(--paper-ink)}
@@ -357,6 +393,15 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:rgba(2
     <span class="prog" id="prog">0 / 9 格 · 0 線</span>
     <button class="btn mini" id="btn-jump">回任務卡</button>
   </div>
+</div>
+
+<div class="rail hide" id="rail">
+  <a class="rail-btn line" id="rail-line" href="#" target="_blank" rel="noopener">
+    <span class="ic">＋</span><span class="tx">加 LINE<b>送 2,000</b></span>
+  </a>
+  <a class="rail-btn site" id="rail-site" href="#" target="_blank" rel="noopener">
+    <span class="ic">★</span><span class="tx">推薦<b>大使活動</b></span>
+  </a>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -884,6 +929,20 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:rgba(2
   function countMeals(){ var l=countLines(); return (l>=1?1:0)+(l>=2?1:0); }
   function presetFor(mode){ return bank(mode).slice(0,9); }
 
+  var scrollY=0;
+  function lockScroll(on){
+    var b=document.body;
+    if(on){
+      scrollY=window.scrollY||0;
+      b.style.top=(-scrollY)+"px";
+      b.classList.add("modal-open");
+    }else{
+      b.classList.remove("modal-open");
+      b.style.top="";
+      window.scrollTo(0, scrollY);
+    }
+  }
+
   var toastT=null;
   function toast(msg){
     var el=$("toast"); el.textContent=msg; el.classList.add("show");
@@ -899,9 +958,10 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:rgba(2
     if(opt.input){ inp.classList.remove("hide"); inp.value=""; inp.placeholder=opt.placeholder||""; }
     else inp.classList.add("hide");
     $("dlg-ok").textContent=opt.ok||"確認";
-    function done(){ dlg.removeEventListener("close",done); cb(dlg.returnValue==="ok", inp.value); }
+    function done(){ dlg.removeEventListener("close",done); lockScroll(false); cb(dlg.returnValue==="ok", inp.value); }
     if(typeof dlg.showModal==="function"){
       dlg.addEventListener("close",done); dlg.showModal();
+      lockScroll(true);
       if(opt.input) setTimeout(function(){ try{inp.focus();}catch(e){} },50);
     }else{
       var okv=window.confirm((opt.title||"")+"\n"+(opt.body||""));
@@ -1487,6 +1547,16 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:rgba(2
   var ctaDrawn=false;
   function buildCTA(){
     var hasLine=!!LINE_URL, hasSite=!!SITE_URL;
+
+    // 側邊浮動列
+    var railOn = S.locked && (hasLine||hasSite);
+    $("rail").classList.toggle("hide", !railOn);
+    document.body.classList.toggle("rail-on", railOn);
+    $("rail-line").classList.toggle("hide", !hasLine);
+    $("rail-site").classList.toggle("hide", !hasSite);
+    if(hasLine) $("rail-line").href=LINE_URL;
+    if(hasSite) $("rail-site").href=SITE_URL;
+
     $("cta-card").classList.toggle("hide", !(hasLine||hasSite));
     $("cta-line").classList.toggle("hide", !hasLine);
     $("cta-site").classList.toggle("hide", !hasSite);

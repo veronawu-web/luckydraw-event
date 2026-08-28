@@ -1,782 +1,697 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-Hant">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>今晚不要滑手機 🍸</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>女神點唱 BINGO · 8月場｜SWAG</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Oswald:wght@300;400;500;600&family=Noto+Serif+TC:wght@400;500;600;700&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet" />
+<style>
+:root{
+  --ink-black:#0D090B; --wine:#3A101D; --burgundy:#5A182B;
+  --hot:#E63D88; --bubble:#F27BAB; --powder:#F5C4D4; --cream:#F7E8E6;
+  --gold:#E9B44C;
+  --paper-ink:#3A101D; --paper-ink-2:#7a4457;
+  --on-dark:#F7E8E6; --on-dark-2:rgba(247,232,230,.66); --on-dark-3:rgba(247,232,230,.42);
+  --serif:'Cormorant Garamond','Noto Serif TC',Georgia,serif;
+  --cjk:'Noto Serif TC','Cormorant Garamond',serif;
+  --cond:'Oswald','Noto Sans TC',sans-serif;
+  --sans:'Noto Sans TC','Oswald',system-ui,sans-serif;
+  --maxw:520px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{
+  background:
+    radial-gradient(120% 60% at 50% 0%, #4a1526 0%, rgba(74,21,38,0) 60%),
+    linear-gradient(180deg,#160A10 0%, var(--ink-black) 45%, #14090E 100%);
+  color:var(--on-dark); font-family:var(--sans);
+  min-height:100vh; -webkit-text-size-adjust:100%;
+}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 16px 140px}
 
-  <style>
-    * {
-      box-sizing: border-box;
-    }
+/* ── header ─────────────────────────────── */
+header.top{padding:26px 0 14px;text-align:center;position:relative}
+.eyebrow{font-family:var(--cond);font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--on-dark-3);margin:0 0 8px}
+h1{font-family:var(--cjk);font-weight:600;font-size:26px;letter-spacing:.06em;margin:0 0 6px;line-height:1.25}
+.meta{font-size:12.5px;color:var(--on-dark-2);margin:0;line-height:1.7}
+.meta b{color:var(--powder);font-weight:500}
 
-    body {
-      margin: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background:
-        radial-gradient(circle at top right, rgba(255, 48, 156, .25), transparent 30%),
-        radial-gradient(circle at bottom left, rgba(132, 75, 255, .22), transparent 30%),
-        #090909;
-      color: white;
-      min-height: 100vh;
-      padding: 24px 16px 60px;
-    }
+/* ── cards ──────────────────────────────── */
+.card{
+  background:linear-gradient(180deg, rgba(247,232,230,.055), rgba(247,232,230,.025));
+  border:1px solid rgba(247,232,230,.14); border-radius:14px;
+  padding:16px; margin:14px 0;
+}
+.card.paper{background:linear-gradient(180deg,#F9EFEC,#F3E2DE);border-color:rgba(58,16,29,.18);color:var(--paper-ink)}
+.card.paper .lbl,.card.paper .hint{color:var(--paper-ink-2)}
+.sec-t{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin:0 0 12px}
+.sec-t h2{font-family:var(--cjk);font-size:16px;font-weight:600;letter-spacing:.05em;margin:0}
+.sec-t .lat{font-family:var(--cond);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--on-dark-3)}
+.card.paper .sec-t .lat{color:var(--paper-ink-2)}
+.lbl{display:block;font-family:var(--cond);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--on-dark-3);margin:0 0 6px}
+.hint{font-size:12px;color:var(--on-dark-2);line-height:1.65;margin:8px 0 0}
+.inp{
+  width:100%;padding:11px 12px;border-radius:9px;font:inherit;font-size:15px;
+  background:rgba(13,9,11,.5);border:1px solid rgba(247,232,230,.2);color:var(--on-dark);
+}
+.card.paper .inp{background:#fff;border-color:rgba(58,16,29,.2);color:var(--paper-ink)}
+.inp:focus{outline:2px solid var(--hot);outline-offset:1px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media (max-width:380px){.row2{grid-template-columns:1fr}}
 
-    .app {
-      max-width: 520px;
-      margin: auto;
-    }
+/* ── buttons ────────────────────────────── */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  width:100%;padding:13px 16px;border-radius:999px;border:0;cursor:pointer;
+  font-family:var(--cond);font-size:14px;font-weight:500;letter-spacing:.1em;
+  background:linear-gradient(180deg,var(--hot),#c92e73);color:#fff;
+}
+.btn:active{transform:translateY(1px)}
+.btn.ghost{background:transparent;border:1px solid rgba(247,232,230,.28);color:var(--on-dark)}
+.btn.mini{width:auto;padding:8px 14px;font-size:12px}
+.btn[disabled]{opacity:.42;cursor:not-allowed}
+.btn-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
 
-    .hero {
-      margin-bottom: 22px;
-    }
+/* ── team strip ─────────────────────────── */
+.team{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:13px}
+.chip{
+  display:inline-flex;align-items:center;gap:6px;padding:6px 11px;border-radius:999px;
+  background:rgba(230,61,136,.14);border:1px solid rgba(230,61,136,.4);
+  font-family:var(--cond);font-size:12px;letter-spacing:.06em;
+}
+.chip.gold{background:rgba(233,180,76,.14);border-color:rgba(233,180,76,.45);color:var(--gold)}
 
-    .eyebrow {
-      color: #ff73ba;
-      font-size: 13px;
-      letter-spacing: .12em;
-      font-weight: 700;
-      margin-bottom: 8px;
-    }
+/* ── status bar ─────────────────────────── */
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0 0}
+.stat{background:rgba(13,9,11,.45);border:1px solid rgba(247,232,230,.12);border-radius:10px;padding:10px 8px;text-align:center}
+.stat .n{font-family:var(--cond);font-size:22px;font-weight:500;line-height:1;color:var(--powder)}
+.stat .k{font-size:10.5px;letter-spacing:.1em;color:var(--on-dark-3);margin-top:5px}
 
-    h1 {
-      font-size: 34px;
-      line-height: 1.05;
-      margin: 0 0 10px;
-    }
+/* ── grid ───────────────────────────────── */
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:4px 0 0}
+.cell{
+  position:relative;aspect-ratio:1;border-radius:11px;cursor:pointer;
+  background:#FBF3F0;border:1px solid rgba(58,16,29,.22);color:var(--paper-ink);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:8px 7px;text-align:center;font-family:var(--cjk);font-size:12.5px;line-height:1.4;
+  transition:transform .12s ease, background .15s ease;
+}
+.cell .no{position:absolute;top:5px;left:7px;font-family:var(--cond);font-size:10px;color:var(--paper-ink-2);opacity:.7}
+.cell .tx{max-height:100%;overflow:hidden}
+.cell.hit{background:linear-gradient(180deg,var(--hot),#cf3479);color:#fff;border-color:var(--hot)}
+.cell.hit .no{color:rgba(255,255,255,.75)}
+.cell.hit::after{
+  content:"✓";position:absolute;right:6px;bottom:4px;font-family:var(--cond);font-size:13px;opacity:.9
+}
+.cell.locked{cursor:not-allowed;opacity:.96}
+.cell.final{box-shadow:0 0 0 2px var(--gold) inset}
+.cell:active{transform:scale(.97)}
 
-    .subtitle {
-      color: #aaa;
-      line-height: 1.6;
-      font-size: 14px;
-    }
+/* ── lines / rewards ────────────────────── */
+.tier{display:flex;gap:10px;align-items:flex-start;padding:11px 0;border-bottom:1px dashed rgba(58,16,29,.18)}
+.tier:last-child{border-bottom:0}
+.tier .tag{
+  flex:0 0 auto;font-family:var(--cond);font-size:11px;letter-spacing:.08em;
+  padding:5px 9px;border-radius:6px;background:rgba(58,16,29,.08);border:1px solid rgba(58,16,29,.18)
+}
+.tier.on .tag{background:var(--hot);border-color:var(--hot);color:#fff}
+.tier .tx{font-size:13px;line-height:1.6}
+.tier .tx b{font-family:var(--cjk);font-weight:600}
+.tier .st{font-family:var(--cond);font-size:11px;letter-spacing:.08em;color:var(--paper-ink-2)}
+.tier.on .st{color:#b3175f}
 
-    .mode-switch {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-      background: #151515;
-      padding: 6px;
-      border-radius: 18px;
-      margin: 20px 0;
-      border: 1px solid #2a2a2a;
-    }
+.menu{margin-top:12px}
+.menu h5{font-family:var(--cjk);font-size:13px;margin:0 0 8px;font-weight:600}
+.opt{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:9px;border:1px solid rgba(58,16,29,.16);margin:0 0 7px;font-size:13.5px;cursor:pointer;background:#fff}
+.opt input{accent-color:var(--hot);width:17px;height:17px;flex:0 0 auto}
+.opt.sel{border-color:var(--hot);background:rgba(230,61,136,.07)}
+fieldset[disabled] .opt,.locked-menu .opt{opacity:.5;cursor:not-allowed}
+.locked-note{font-size:12px;color:var(--paper-ink-2);margin:6px 0 0}
 
-    .mode-btn {
-      border: none;
-      background: transparent;
-      color: #888;
-      padding: 12px;
-      border-radius: 14px;
-      font-weight: 700;
-      cursor: pointer;
-    }
+/* ── toast / dialog ─────────────────────── */
+.toast{
+  position:fixed;left:50%;bottom:96px;transform:translateX(-50%) translateY(12px);
+  background:rgba(13,9,11,.94);border:1px solid rgba(247,232,230,.2);color:var(--on-dark);
+  padding:11px 16px;border-radius:999px;font-size:13px;z-index:60;
+  opacity:0;pointer-events:none;transition:opacity .2s ease, transform .2s ease;max-width:88vw;text-align:center
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+dialog{
+  border:0;padding:0;background:transparent;max-width:400px;width:calc(100% - 32px);
+}
+dialog::backdrop{background:rgba(9,5,7,.72)}
+.modal{background:#F9EFEC;color:var(--paper-ink);border-radius:14px;padding:20px}
+.modal h3{font-family:var(--cjk);font-size:17px;margin:0 0 8px}
+.modal p{font-size:13.5px;line-height:1.7;margin:0 0 14px;color:var(--paper-ink-2)}
+.modal .inp{margin-bottom:12px}
+.modal .btn.ghost{border-color:rgba(58,16,29,.28);color:var(--paper-ink)}
 
-    .mode-btn.active {
-      background: linear-gradient(135deg, #ff3c9e, #8a5cff);
-      color: white;
-      box-shadow: 0 4px 18px rgba(255, 60, 158, .28);
-    }
-
-    .toolbar {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 16px;
-    }
-
-    button {
-      font-family: inherit;
-    }
-
-    .secondary,
-    .panic {
-      flex: 1;
-      border-radius: 14px;
-      padding: 12px 10px;
-      font-weight: 700;
-      border: 1px solid #333;
-      cursor: pointer;
-    }
-
-    .secondary {
-      background: #171717;
-      color: white;
-    }
-
-    .panic {
-      background: #fff;
-      color: #111;
-    }
-
-    .status {
-      font-size: 13px;
-      color: #aaa;
-      margin: 14px 2px;
-      display: flex;
-      justify-content: space-between;
-      gap: 12px;
-    }
-
-    .bingo {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 8px;
-    }
-
-    .cell {
-      aspect-ratio: 1 / 1;
-      border: 1px solid #292929;
-      background:
-        linear-gradient(145deg, rgba(255,255,255,.045), rgba(255,255,255,.01));
-      color: white;
-      border-radius: 16px;
-      padding: 9px;
-      font-size: 12px;
-      line-height: 1.35;
-      cursor: pointer;
-      transition: .18s ease;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .cell:active {
-      transform: scale(.96);
-    }
-
-    .cell.completed {
-      background: linear-gradient(135deg, #ff3c9e, #8459ff);
-      border-color: transparent;
-      font-weight: 700;
-      box-shadow: 0 5px 18px rgba(255, 60, 158, .2);
-    }
-
-    .cell.completed::after {
-      content: "✓";
-      position: absolute;
-      right: 7px;
-      top: 4px;
-      font-size: 14px;
-      opacity: .85;
-    }
-
-    .footer-note {
-      margin-top: 18px;
-      font-size: 12px;
-      color: #777;
-      line-height: 1.5;
-      text-align: center;
-    }
-
-    .modal {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,.72);
-      backdrop-filter: blur(10px);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 22px;
-      z-index: 20;
-    }
-
-    .modal.show {
-      display: flex;
-    }
-
-    .modal-card {
-      width: 100%;
-      max-width: 420px;
-      border-radius: 26px;
-      padding: 24px;
-      background:
-        radial-gradient(circle at top right, rgba(255, 76, 172, .22), transparent 40%),
-        #121212;
-      border: 1px solid #333;
-      box-shadow: 0 25px 70px rgba(0,0,0,.5);
-    }
-
-    .modal-tag {
-      font-size: 12px;
-      font-weight: 800;
-      color: #ff73ba;
-      letter-spacing: .12em;
-      margin-bottom: 10px;
-    }
-
-    .modal h2 {
-      font-size: 27px;
-      margin: 0 0 10px;
-    }
-
-    .modal p {
-      color: #ddd;
-      font-size: 17px;
-      line-height: 1.55;
-      margin-bottom: 22px;
-    }
-
-    .modal-actions {
-      display: flex;
-      gap: 10px;
-    }
-
-    .modal-actions button {
-      flex: 1;
-      border: none;
-      border-radius: 14px;
-      padding: 13px;
-      font-weight: 800;
-      cursor: pointer;
-    }
-
-    .close-btn {
-      background: #292929;
-      color: white;
-    }
-
-    .again-btn {
-      background: linear-gradient(135deg, #ff3c9e, #8a5cff);
-      color: white;
-    }
-
-    .bingo-alert {
-      position: fixed;
-      top: 18px;
-      left: 50%;
-      transform: translateX(-50%) translateY(-120px);
-      background: white;
-      color: #111;
-      padding: 14px 20px;
-      border-radius: 999px;
-      font-weight: 900;
-      z-index: 50;
-      transition: .3s ease;
-      box-shadow: 0 15px 45px rgba(0,0,0,.3);
-      white-space: nowrap;
-    }
-
-    .bingo-alert.show {
-      transform: translateX(-50%) translateY(0);
-    }
-
-    @media (max-width: 380px) {
-      .cell {
-        font-size: 11px;
-        padding: 7px;
-      }
-
-      h1 {
-        font-size: 30px;
-      }
-    }
-  </style>
+/* ── sticky footer ──────────────────────── */
+.sticky{
+  position:fixed;left:0;right:0;bottom:0;z-index:50;
+  background:linear-gradient(180deg,rgba(13,9,11,0),rgba(13,9,11,.94) 34%);
+  padding:16px;padding-bottom:max(16px,env(safe-area-inset-bottom));
+}
+.sticky .in{max-width:var(--maxw);margin:0 auto;display:flex;gap:8px;align-items:center}
+.sticky .prog{flex:1;font-family:var(--cond);font-size:12px;letter-spacing:.08em;color:var(--on-dark-2)}
+.hide{display:none !important}
+.foot{text-align:center;font-family:var(--cond);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--on-dark-3);padding:8px 0 0}
+.draft{
+  display:inline-block;font-family:var(--cond);font-size:10px;letter-spacing:.12em;
+  color:var(--gold);border:1px solid rgba(233,180,76,.5);border-radius:5px;padding:2px 6px;margin-left:6px
+}
+</style>
 </head>
-
 <body>
 
-<div class="app">
+<div class="wrap">
 
-  <div class="hero">
-    <div class="eyebrow">FRIENDS NIGHT OUT ✦</div>
+  <header class="top">
+    <p class="eyebrow">Main Game · 8/29 oncor 信義店</p>
+    <h1>女神點唱 BINGO</h1>
+    <p class="meta">3×3 九格・主播 × 用戶組隊・<b>網頁版現場核銷</b><br />每完成一格，由主播或工作人員蓋章</p>
+  </header>
 
-    <h1>
-      今晚不要<br>
-      滑手機 📵
-    </h1>
-
-    <div class="subtitle">
-      完成任務、逼朋友聊天、挖一點八卦。<br>
-      Bingo 的人獲得一次指定權 😈
-    </div>
-  </div>
-
-  <div class="mode-switch">
-    <button class="mode-btn active" onclick="setMode(3, this)">
-      3 人暖身局
-    </button>
-
-    <button class="mode-btn" onclick="setMode(7, this)">
-      7 人混亂局
-    </button>
-  </div>
-
-  <div class="toolbar">
-    <button class="secondary" onclick="generateBoard()">
-      🎲 換一張
-    </button>
-
-    <button class="panic" onclick="rescueTable()">
-      🚨 救救這桌
-    </button>
-  </div>
-
-  <div class="status">
-    <span id="modeLabel">3 人模式</span>
-    <span id="progress">0 / 16 完成</span>
-  </div>
-
-  <div id="bingo" class="bingo"></div>
-
-  <div class="footer-note">
-    喝酒只是選項，不想喝就改成真心話或任務。<br>
-    今天的 KPI：大家真的有在講話。
-  </div>
-
-</div>
-
-
-<div id="modal" class="modal">
-
-  <div class="modal-card">
-
-    <div class="modal-tag">
-      EMERGENCY MISSION
+  <!-- ===== STEP 1：組隊 ＋ 選卡 ===== -->
+  <section class="card" id="setup">
+    <div class="sec-t"><h2>組隊登記</h2><span class="lat">step 1</span></div>
+    <div class="row2">
+      <div>
+        <span class="lbl">用戶帳號</span>
+        <input class="inp" id="in-user" type="text" placeholder="SWAG 帳號" autocomplete="off" />
+      </div>
+      <div>
+        <span class="lbl">組隊主播</span>
+        <input class="inp" id="in-host" type="text" placeholder="主播帳號" autocomplete="off" />
+      </div>
     </div>
 
-    <h2 id="modalTitle">
-      氣氛急救 🚑
-    </h2>
-
-    <p id="modalText"></p>
-
-    <div class="modal-actions">
-
-      <button
-        class="close-btn"
-        onclick="closeModal()"
-      >
-        完成
-      </button>
-
-      <button
-        class="again-btn"
-        onclick="rescueTable()"
-      >
-        再抽一個
-      </button>
-
+    <div style="margin-top:16px">
+      <span class="lbl">卡片類型</span>
+      <label class="opt sel" id="opt-preset"><input type="radio" name="ctype" value="preset" checked /><span>預設卡（9 格已排好）</span></label>
+      <label class="opt" id="opt-custom"><input type="radio" name="ctype" value="custom" /><span>自建卡（用戶＋主播現場填 9 格）</span></label>
     </div>
 
+    <div id="custom-box" class="hide" style="margin-top:14px">
+      <span class="lbl">自建 9 格任務<span class="draft">不可重複</span></span>
+      <div id="custom-inputs"></div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn" id="btn-lock">鎖定卡片・開始遊戲</button>
+    </div>
+    <p class="hint">鎖卡後任務內容不可再改（可由工作人員解鎖）。進度存在這台裝置，重新整理不會消失。</p>
+  </section>
+
+  <!-- ===== STEP 2：卡片 ===== -->
+  <section id="game" class="hide">
+
+    <div class="card">
+      <div class="team">
+        <span class="chip" id="chip-user">用戶</span>
+        <span style="color:var(--on-dark-3)">×</span>
+        <span class="chip" id="chip-host">主播</span>
+        <span class="chip gold" id="chip-type">預設卡</span>
+      </div>
+      <div class="stats">
+        <div class="stat"><div class="n" id="s-cell">0<span style="font-size:13px;color:var(--on-dark-3)">/9</span></div><div class="k">已蓋章</div></div>
+        <div class="stat"><div class="n" id="s-line">0</div><div class="k">連線數</div></div>
+        <div class="stat"><div class="n" id="s-red">0</div><div class="k">可抽紅包</div></div>
+      </div>
+    </div>
+
+    <div class="card paper">
+      <div class="sec-t"><h2>任務卡</h2><span class="lat">tap to stamp</span></div>
+      <div class="grid" id="grid"></div>
+      <p class="locked-note">點格子＝蓋章。第 9 格（最後一格）需<b>工作人員輸入現場碼</b>核銷。誤按可長按格子取消。</p>
+    </div>
+
+    <div class="card paper">
+      <div class="sec-t"><h2>連線獎勵</h2><span class="lat">rewards</span></div>
+
+      <div class="tier" id="t1">
+        <span class="tag">連 1 線</span>
+        <span class="tx"><b>選 1 份主食（5 選 1）</b> ＋抽紅包 ×1<br /><span class="st" id="t1-st">尚未達成</span></span>
+      </div>
+      <div class="tier" id="t2">
+        <span class="tag">連 2 線</span>
+        <span class="tx"><b>選 1 樣飲品（3 選 1）</b> ＋抽紅包 ×1<br /><span class="st" id="t2-st">尚未達成</span></span>
+      </div>
+      <div class="tier" id="t3">
+        <span class="tag">全連 9 格</span>
+        <span class="tx"><b>第一名 5,000 點餐額度</b> ＋抽紅包 ×1<br /><span class="st" id="t3-st">尚未達成</span></span>
+      </div>
+
+      <div class="menu" id="menu-food">
+        <h5>主食 5 選 1</h5>
+        <div id="food-opts"></div>
+        <p class="locked-note" id="food-note">連 1 線後開放選擇。</p>
+      </div>
+
+      <div class="menu" id="menu-drink">
+        <h5>飲品 3 選 1</h5>
+        <div id="drink-opts"></div>
+        <p class="locked-note" id="drink-note">連 2 線後開放選擇。</p>
+      </div>
+
+      <div class="menu">
+        <h5>向主辦許願（選填）</h5>
+        <input class="inp" id="in-wish" type="text" maxlength="60" placeholder="想吃想喝的、或任何想說的話" />
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="sec-t"><h2>工作人員</h2><span class="lat">staff only</span></div>
+      <div class="btn-row">
+        <button class="btn ghost mini" id="btn-summary">產出這組結算摘要</button>
+        <button class="btn ghost mini" id="btn-unlock">解鎖卡片</button>
+        <button class="btn ghost mini" id="btn-reset">換下一位（清除本機）</button>
+      </div>
+      <p class="hint">現場碼預設 <b>0829</b>，可在檔案第一段 <code>STAFF_CODE</code> 修改。摘要會顯示可複製的文字，供核銷名單登記。</p>
+    </div>
+
+  </section>
+
+  <p class="foot">SWAG · 8 月女神聚會 · oncor 信義店 · 8/29（六）</p>
+</div>
+
+<!-- sticky -->
+<div class="sticky hide" id="sticky">
+  <div class="in">
+    <span class="prog" id="prog">0 / 9 格 · 0 線</span>
+    <button class="btn mini" id="btn-jump">回任務卡</button>
   </div>
-
 </div>
 
+<div class="toast" id="toast"></div>
 
-<div id="bingoAlert" class="bingo-alert">
-  🎉 BINGO！獲得一次指定權
-</div>
-
+<dialog id="dlg">
+  <form class="modal" method="dialog" id="dlg-form">
+    <h3 id="dlg-t">確認</h3>
+    <p id="dlg-p"></p>
+    <input class="inp hide" id="dlg-in" type="text" inputmode="numeric" autocomplete="off" />
+    <div style="display:flex;gap:8px">
+      <button class="btn ghost" value="cancel" type="submit">取消</button>
+      <button class="btn" value="ok" type="submit" id="dlg-ok">確認</button>
+    </div>
+  </form>
+</dialog>
 
 <script>
-
-let mode = 3;
-
-
-// =========================
-// 3 人任務
-// =========================
-
-const tasks3 = [
-
-  "三個人一起自拍一張",
-
-  "說出對右邊那個人的第一印象",
-
-  "猜中其中一人的理想型",
-
-  "讓其中一個人笑到不行",
-
-  "公開最近一次 Google 搜尋",
-
-  "說一件另外兩人不知道的事",
-
-  "三個人找出一個共同點",
-
-  "模仿其中一個人講話",
-
-  "說出最近最荒謬的一件事",
-
-  "讓其中一人主動乾杯",
-
-  "講一個最近的小八卦",
-
-  "交換手機桌布給大家看",
-
-  "說出最近最容易暈的人",
-
-  "三人票選最可能突然消失的人",
-
-  "講一件喝醉後做過的蠢事",
-
-  "說出最近一次心動是什麼時候",
-
-  "每人講一個彼此的優點",
-
-  "票選誰最容易談戀愛失智",
-
-  "講最近最想封鎖的人類型",
-
-  "說出一個近期秘密願望",
-
-  "猜另外兩人最近最常聊天的人",
-
-  "三人一起手機倒扣 5 分鐘",
-
-  "說出自己目前最大的怪癖",
-
-  "描述自己的約會地雷",
-
-  "講一件最近很後悔的事",
-
-  "說出最不可能交往的類型",
-
-  "每人講一件今年想完成的事",
-
-  "票選誰最容易酒後亂傳訊息",
-
-  "分享最近一次尷尬瞬間",
-
-  "說出自己最吃哪種顏值",
-
-  "三人交換座位",
-
-  "用三個詞形容右邊的人",
-
-  "講最近偷偷羨慕別人的事",
-
-  "選一人回答真心話",
-
-  "說出一個自己的戀愛紅旗",
-
-  "票選今晚最可能喝最多的人"
-
-];
-
-
-// =========================
-// 7 人任務
-// =========================
-
-const tasks7 = [
-
-  ...tasks3,
-
-  "找到一個跟你同星座元素的人",
-
-  "和今晚最不熟的人自拍",
-
-  "跟兩個人交換座位",
-
-  "讓全桌一起乾杯",
-
-  "票選今晚最可能失蹤的人",
-
-  "票選誰最容易暈船",
-
-  "讓三個人一起完成同一個動作",
-
-  "找出兩個生日月份相同的人",
-
-  "票選誰的手機最不能公開",
-
-  "讓一個人講自己的戀愛黑歷史",
-
-  "指定兩人互講第一印象",
-
-  "全桌手機倒扣 5 分鐘",
-
-  "找出一件七人共同做過的事",
-
-  "票選今天穿搭第一名",
-
-  "讓最安靜的人出一道題",
-
-  "讓全桌選出最會談戀愛的人",
-
-  "指定一個人公開最近 emoji",
-
-  "全桌票選最神秘的人",
-
-  "指定兩人猜彼此 MBTI",
-
-  "每人用一句話形容今晚"
-];
-
-
-// =========================
-// 急救任務
-// =========================
-
-const rescue3 = [
-
-  "手機全部倒扣 5 分鐘。每個人講一個最近發生、但還沒跟另外兩人說的事。",
-
-  "3、2、1，同時指：誰最容易暈船？被指最多的人要解釋自己到底會不會。",
-
-  "每個人講：「我第一次認識你時以為你是___，結果你其實是___。」",
-
-  "輪流講一個自己的戀愛地雷，不能重複。想不到的人接受任務。",
-
-  "每人打開最近使用的 5 個 emoji，另外兩人分析你的精神狀態。",
-
-  "票選：今晚誰最可能喝完酒突然想找某個人？本人必須解釋。",
-
-  "每個人說一個最近很想做、但一直拖著沒做的事。",
-
-  "輪流講一個『我其實超在意但平常裝沒差』的東西。",
-
-  "3、2、1，同時指最容易戀愛腦的人。被指最多的人回答最近有沒有暈。",
-
-  "每個人說一件『如果明天不用上班，我現在最想去哪裡』。",
-
-  "一人出題：如果我們三個交換人生一天，你最不想當誰？為什麼？",
-
-  "選一個人當主持人，問另外兩個人一題不能只回答是或不是的問題。"
-
-];
-
-
-const rescue7 = [
-
-  ...rescue3,
-
-  "全桌手機倒扣。從最晚到的人開始，每人問下一位一個真心話。",
-
-  "7 人同時指：誰最容易偷偷跟前任復合？得票最高的人回答。",
-
-  "每人寫下一個人的名字。3、2、1 公開：今晚最可能突然消失的人。",
-
-  "票選今晚最適合去搭訕陌生人的人，獲勝者指定下一個任務。",
-
-  "每人用一句話形容左邊的人，但不能用外表。",
-
-  "全桌票選：誰談戀愛後最可能人間蒸發？",
-
-  "選兩個最不熟的人互問：第一印象＋現在印象。",
-
-  "所有人選一個：真心話 / 任務 / 喝一口。少數派接受其他人的追問。"
-];
-
-
-// =========================
-// 產生 Bingo
-// =========================
-
-function generateBoard() {
-
-  const source =
-    mode === 3
-      ? tasks3
-      : tasks7;
-
-  const shuffled =
-    [...source]
-      .sort(() => Math.random() - 0.5);
-
-  const selected =
-    shuffled.slice(0, 16);
-
-  const bingo =
-    document.getElementById("bingo");
-
-  bingo.innerHTML = "";
-
-  selected.forEach((task) => {
-
-    const cell =
-      document.createElement("button");
-
-    cell.className = "cell";
-
-    cell.textContent = task;
-
-    cell.onclick = () => {
-
-      cell.classList.toggle("completed");
-
-      updateProgress();
-
-      checkBingo();
-
-    };
-
-    bingo.appendChild(cell);
-
-  });
-
-  updateProgress();
-
-}
-
-
-// =========================
-// 模式切換
-// =========================
-
-function setMode(number, button) {
-
-  mode = number;
-
-  document
-    .querySelectorAll(".mode-btn")
-    .forEach(btn =>
-      btn.classList.remove("active")
-    );
-
-  button.classList.add("active");
-
-  document.getElementById("modeLabel")
-    .textContent =
-      `${number} 人模式`;
-
-  generateBoard();
-
-}
-
-
-// =========================
-// 進度
-// =========================
-
-function updateProgress() {
-
-  const completed =
-    document
-      .querySelectorAll(".cell.completed")
-      .length;
-
-  document
-    .getElementById("progress")
-    .textContent =
-      `${completed} / 16 完成`;
-
-}
-
-
-// =========================
-// Bingo 判斷
-// =========================
-
-function checkBingo() {
-
-  const cells =
-    [...document.querySelectorAll(".cell")];
-
-  const completed =
-    cells.map(cell =>
-      cell.classList.contains("completed")
-    );
-
-  const lines = [
-
-    // 橫
-    [0,1,2,3],
-    [4,5,6,7],
-    [8,9,10,11],
-    [12,13,14,15],
-
-    // 直
-    [0,4,8,12],
-    [1,5,9,13],
-    [2,6,10,14],
-    [3,7,11,15],
-
-    // 斜
-    [0,5,10,15],
-    [3,6,9,12]
-
+(function(){
+  "use strict";
+
+  /* ============================================================
+     可調參數
+     ============================================================ */
+  var STAFF_CODE = "0829";          // 工作人員現場碼
+  var STORE_KEY  = "swag_bingo_0829_v1";
+
+  // 預設卡 9 格任務（草稿，現場可改：直接改這裡的文字）
+  var PRESET = [
+    "與女神合唱一首經典國語歌",
+    "女神點一首歌，用戶唱副歌",
+    "用戶點一首女神沒聽過的歌",
+    "找另一組一起合唱一首（4 人）",
+    "猜歌前奏，答對 1 題",
+    "與女神合拍一張同框照",
+    "與另一組交換點一首歌",
+    "全場大合唱時一起舉手同框",
+    "女神指定一首歌，用戶完整唱完"
   ];
 
-  const bingo =
-    lines.some(line =>
-      line.every(index =>
-        completed[index]
-      )
-    );
+  var FOOD = [
+    "麻辣燙和牛牛肉麵",
+    "大紅袍炭香紅燒牛肉麵",
+    "韓式碳烤帶骨牛小排包生菜",
+    "韓式醬烤豬五花包生菜",
+    "蒜香和牛炒飯"
+  ];
+  var DRINK = [
+    "山崎焙煎樽梅酒",
+    "西班牙金星啤酒（750ml）",
+    "日式清酒蛤蠣湯 ×2"
+  ];
 
-  if (bingo) {
-    showBingo();
+  // 8 條線（3 橫 3 直 2 斜）
+  var LINES = [
+    [0,1,2],[3,4,5],[6,7,8],
+    [0,3,6],[1,4,7],[2,5,8],
+    [0,4,8],[2,4,6]
+  ];
+
+  /* ============================================================
+     狀態 ＋ 存檔（localStorage，失敗則退回記憶體）
+     ============================================================ */
+  var mem = null;
+  var S = {
+    user:"", host:"", type:"preset",
+    tasks:PRESET.slice(),
+    hits:[false,false,false,false,false,false,false,false,false],
+    locked:false, food:"", drink:"", wish:"",
+    firstAll:false            // 是否已由工作人員登記全連
+  };
+
+  function save(){
+    var raw = JSON.stringify(S);
+    mem = raw;
+    try{ localStorage.setItem(STORE_KEY, raw); }catch(e){}
+  }
+  function load(){
+    var raw = null;
+    try{ raw = localStorage.getItem(STORE_KEY); }catch(e){}
+    if(!raw) raw = mem;
+    if(!raw) return;
+    try{
+      var o = JSON.parse(raw);
+      if(o && typeof o === "object"){
+        if(typeof o.user==="string") S.user=o.user;
+        if(typeof o.host==="string") S.host=o.host;
+        if(o.type==="custom"||o.type==="preset") S.type=o.type;
+        if(Array.isArray(o.tasks)&&o.tasks.length===9) S.tasks=o.tasks.map(String);
+        if(Array.isArray(o.hits)&&o.hits.length===9) S.hits=o.hits.map(Boolean);
+        S.locked=!!o.locked; S.firstAll=!!o.firstAll;
+        if(typeof o.food==="string") S.food=o.food;
+        if(typeof o.drink==="string") S.drink=o.drink;
+        if(typeof o.wish==="string") S.wish=o.wish;
+      }
+    }catch(e){}
+  }
+  function clearStore(){
+    mem = null;
+    try{ localStorage.removeItem(STORE_KEY); }catch(e){}
   }
 
-}
+  /* ============================================================
+     小工具
+     ============================================================ */
+  function $(id){ return document.getElementById(id); }
+  function esc(s){ var d=document.createElement("div"); d.textContent=(s==null?"":String(s)); return d.innerHTML; }
+  function countHits(){ var n=0; for(var i=0;i<9;i++) if(S.hits[i]) n++; return n; }
+  function countLines(){
+    var n=0;
+    for(var i=0;i<LINES.length;i++){
+      var L=LINES[i];
+      if(S.hits[L[0]]&&S.hits[L[1]]&&S.hits[L[2]]) n++;
+    }
+    return n;
+  }
+  var toastT=null;
+  function toast(msg){
+    var el=$("toast"); el.textContent=msg; el.classList.add("show");
+    if(toastT) clearTimeout(toastT);
+    toastT=setTimeout(function(){ el.classList.remove("show"); },2400);
+  }
 
+  // dialog：confirm / prompt
+  function ask(opt, cb){
+    var dlg=$("dlg");
+    $("dlg-t").textContent = opt.title||"確認";
+    $("dlg-p").textContent = opt.body||"";
+    var inp=$("dlg-in");
+    if(opt.input){ inp.classList.remove("hide"); inp.value=""; inp.placeholder=opt.placeholder||""; }
+    else inp.classList.add("hide");
+    $("dlg-ok").textContent = opt.ok||"確認";
+    function done(){
+      dlg.removeEventListener("close", done);
+      cb(dlg.returnValue==="ok", inp.value);
+    }
+    dlg.addEventListener("close", done);
+    if(typeof dlg.showModal==="function") dlg.showModal();
+    else { // 極舊瀏覽器 fallback
+      var okv = window.confirm((opt.title||"")+"\n"+(opt.body||""));
+      var v = okv && opt.input ? (window.prompt(opt.placeholder||"")||"") : "";
+      cb(okv, v);
+    }
+    if(opt.input) setTimeout(function(){ try{inp.focus();}catch(e){} },50);
+  }
 
-// =========================
-// Bingo 提示
-// =========================
+  /* ============================================================
+     Step 1：組隊 ＋ 選卡
+     ============================================================ */
+  function buildCustomInputs(){
+    var box=$("custom-inputs"); box.innerHTML="";
+    for(var i=0;i<9;i++){
+      var w=document.createElement("div");
+      w.style.marginBottom="7px";
+      w.innerHTML='<input class="inp ct" data-i="'+i+'" type="text" maxlength="24" placeholder="第 '+(i+1)+' 格任務" />';
+      box.appendChild(w);
+    }
+    var ins=box.querySelectorAll(".ct");
+    for(var j=0;j<ins.length;j++){
+      if(S.type==="custom" && S.tasks[j]) ins[j].value=S.tasks[j];
+    }
+  }
 
-let bingoTimeout;
+  function syncTypeUI(){
+    var custom = S.type==="custom";
+    $("custom-box").classList.toggle("hide", !custom);
+    $("opt-preset").classList.toggle("sel", !custom);
+    $("opt-custom").classList.toggle("sel", custom);
+  }
 
-function showBingo() {
+  var radios=document.querySelectorAll('input[name="ctype"]');
+  for(var r=0;r<radios.length;r++){
+    radios[r].addEventListener("change", function(){
+      S.type = this.value==="custom" ? "custom" : "preset";
+      if(S.type==="preset") S.tasks = PRESET.slice();
+      syncTypeUI(); save();
+    });
+  }
 
-  const alert =
-    document.getElementById("bingoAlert");
+  $("btn-lock").addEventListener("click", function(){
+    var u=$("in-user").value.trim(), h=$("in-host").value.trim();
+    if(!u || !h){ toast("請先填用戶帳號與組隊主播"); return; }
 
-  alert.classList.add("show");
+    var tasks;
+    if(S.type==="custom"){
+      tasks=[]; var ins=document.querySelectorAll("#custom-inputs .ct");
+      for(var i=0;i<ins.length;i++) tasks.push(ins[i].value.trim());
+      for(var k=0;k<9;k++) if(!tasks[k]){ toast("自建卡要填滿 9 格（第 "+(k+1)+" 格未填）"); return; }
+      var seen={};
+      for(var m=0;m<9;m++){
+        var key=tasks[m];
+        if(seen[key]){ toast("任務不可重複：「"+key+"」"); return; }
+        seen[key]=1;
+      }
+    }else{
+      tasks=PRESET.slice();
+    }
 
-  clearTimeout(bingoTimeout);
+    S.user=u; S.host=h; S.tasks=tasks; S.locked=true;
+    save(); render();
+    toast("卡片已鎖定，開始蓋章！");
+  });
 
-  bingoTimeout =
-    setTimeout(() => {
-      alert.classList.remove("show");
-    }, 2500);
+  /* ============================================================
+     Step 2：蓋章 ＋ 連線
+     ============================================================ */
+  function stampsLeft(){ return 9-countHits(); }
 
-}
+  function doStamp(i){
+    if(S.hits[i]) return;
+    // 最後一格（第 9 個章）需工作人員現場碼
+    if(stampsLeft()===1){
+      ask({
+        title:"第 9 格核銷",
+        body:"這是最後一格，需工作人員輸入現場碼登記全連。",
+        input:true, placeholder:"現場碼", ok:"核銷"
+      }, function(ok, val){
+        if(!ok) return;
+        if(String(val).trim()!==STAFF_CODE){ toast("現場碼不正確"); return; }
+        S.hits[i]=true; S.firstAll=true; save(); render();
+        toast("全連完成！請登記第一名與 5,000 點餐額度");
+      });
+      return;
+    }
+    var before=countLines();
+    S.hits[i]=true; save(); render();
+    var after=countLines();
+    if(after>before){
+      if(after===1) toast("連 1 線！可選 1 份主食 ＋ 抽紅包 ×1");
+      else if(after===2) toast("連 2 線！可選 1 樣飲品 ＋ 抽紅包 ×1");
+      else toast("再多一條線！目前 "+after+" 線");
+    }
+  }
 
+  function undoStamp(i){
+    if(!S.hits[i]) return;
+    ask({title:"取消這一格？", body:"「"+S.tasks[i]+"」的蓋章會被移除。", ok:"取消蓋章"}, function(ok){
+      if(!ok) return;
+      S.hits[i]=false;
+      if(countHits()<9) S.firstAll=false;
+      save(); render(); toast("已取消該格蓋章");
+    });
+  }
 
-// =========================
-// 救救這桌
-// =========================
+  function buildGrid(){
+    var g=$("grid"); g.innerHTML="";
+    for(var i=0;i<9;i++){
+      var d=document.createElement("div");
+      d.className="cell"+(S.hits[i]?" hit":"")+(!S.hits[i]&&stampsLeft()===1?" final":"");
+      d.setAttribute("data-i", i);
+      d.innerHTML='<span class="no">'+(i+1)+'</span><span class="tx">'+esc(S.tasks[i])+'</span>';
+      g.appendChild(d);
+    }
+  }
 
-function rescueTable() {
+  // 點擊＝蓋章；長按（600ms）＝取消
+  var pressT=null, pressed=-1, longFired=false;
+  function bindGrid(){
+    var g=$("grid");
+    g.addEventListener("pointerdown", function(e){
+      var c=e.target.closest(".cell"); if(!c) return;
+      pressed=parseInt(c.getAttribute("data-i"),10); longFired=false;
+      if(pressT) clearTimeout(pressT);
+      pressT=setTimeout(function(){ longFired=true; undoStamp(pressed); },600);
+    });
+    g.addEventListener("pointerup", function(e){
+      if(pressT){ clearTimeout(pressT); pressT=null; }
+      var c=e.target.closest(".cell"); if(!c) return;
+      if(longFired){ longFired=false; return; }
+      var i=parseInt(c.getAttribute("data-i"),10);
+      if(S.hits[i]) toast("已蓋章。長按可取消");
+      else doStamp(i);
+    });
+    g.addEventListener("pointerleave", function(){ if(pressT){ clearTimeout(pressT); pressT=null; } });
+    g.addEventListener("contextmenu", function(e){ e.preventDefault(); });
+  }
 
-  const source =
-    mode === 3
-      ? rescue3
-      : rescue7;
+  /* ============================================================
+     餐飲選單
+     ============================================================ */
+  function buildMenu(id, arr, group, val, enabled){
+    var box=$(id); box.innerHTML="";
+    for(var i=0;i<arr.length;i++){
+      var lab=document.createElement("label");
+      lab.className="opt"+(val===arr[i]?" sel":"");
+      lab.innerHTML='<input type="radio" name="'+group+'" value="'+esc(arr[i])+'"'+
+                    (val===arr[i]?" checked":"")+(enabled?"":" disabled")+' /><span>'+esc(arr[i])+'</span>';
+      box.appendChild(lab);
+    }
+    box.classList.toggle("locked-menu", !enabled);
+  }
 
-  const task =
-    source[
-      Math.floor(
-        Math.random() * source.length
-      )
-    ];
+  function bindMenus(){
+    document.addEventListener("change", function(e){
+      var t=e.target;
+      if(t && t.name==="food"){ S.food=t.value; save(); render(); toast("主食已登記："+t.value); }
+      if(t && t.name==="drink"){ S.drink=t.value; save(); render(); toast("飲品已登記："+t.value); }
+    });
+    $("in-wish").addEventListener("input", function(){ S.wish=this.value; save(); });
+  }
 
-  document
-    .getElementById("modalText")
-    .textContent = task;
+  /* ============================================================
+     工作人員
+     ============================================================ */
+  $("btn-unlock").addEventListener("click", function(){
+    ask({title:"解鎖卡片？", body:"解鎖後可修改組隊與任務內容，已蓋的章會保留。", input:true, placeholder:"現場碼", ok:"解鎖"},
+    function(ok,val){
+      if(!ok) return;
+      if(String(val).trim()!==STAFF_CODE){ toast("現場碼不正確"); return; }
+      S.locked=false; save(); render(); toast("已解鎖，可修改卡片");
+    });
+  });
 
-  document
-    .getElementById("modal")
-    .classList.add("show");
+  $("btn-reset").addEventListener("click", function(){
+    ask({title:"換下一位？", body:"這台裝置的進度會全部清除，無法復原。請先確認已登記結算。", input:true, placeholder:"現場碼", ok:"清除"},
+    function(ok,val){
+      if(!ok) return;
+      if(String(val).trim()!==STAFF_CODE){ toast("現場碼不正確"); return; }
+      clearStore();
+      S={user:"",host:"",type:"preset",tasks:PRESET.slice(),
+         hits:[false,false,false,false,false,false,false,false,false],
+         locked:false,food:"",drink:"",wish:"",firstAll:false};
+      save(); render(); toast("已清除，可交給下一位");
+    });
+  });
 
-}
+  $("btn-summary").addEventListener("click", function(){
+    var lines=countLines(), hits=countHits();
+    var red=(lines>=1?1:0)+(lines>=2?1:0)+(hits===9?1:0);
+    var txt=
+      "【女神點唱 BINGO 結算】8/29 oncor\n"+
+      "用戶："+S.user+"　主播："+S.host+"\n"+
+      "卡片："+(S.type==="custom"?"自建卡":"預設卡")+"\n"+
+      "蓋章："+hits+"/9　連線："+lines+" 線\n"+
+      "主食："+(S.food||"—")+"\n"+
+      "飲品："+(S.drink||"—")+"\n"+
+      "可抽紅包："+red+" 次\n"+
+      "全連："+(hits===9?"是（需登記是否為第一名／5,000 點餐額度）":"否")+"\n"+
+      "許願："+(S.wish||"—");
+    ask({title:"結算摘要", body:txt, ok:"複製"}, function(ok){
+      if(!ok) return;
+      try{
+        navigator.clipboard.writeText(txt);
+        toast("已複製，可貼到核銷名單");
+      }catch(e){ toast("複製失敗，請手動抄寫"); }
+    });
+  });
 
+  $("btn-jump").addEventListener("click", function(){
+    var g=$("grid"); if(g) g.scrollIntoView({behavior:"smooth",block:"center"});
+  });
 
-// =========================
-// 關閉 Modal
-// =========================
+  /* ============================================================
+     render
+     ============================================================ */
+  function render(){
+    var hits=countHits(), lines=countLines();
+    var red=(lines>=1?1:0)+(lines>=2?1:0)+(hits===9?1:0);
 
-function closeModal() {
+    // step 切換
+    $("setup").classList.toggle("hide", S.locked);
+    $("game").classList.toggle("hide", !S.locked);
+    $("sticky").classList.toggle("hide", !S.locked);
 
-  document
-    .getElementById("modal")
-    .classList.remove("show");
+    if(!S.locked){
+      $("in-user").value=S.user; $("in-host").value=S.host;
+      syncTypeUI();
+      return;
+    }
 
-}
+    $("chip-user").textContent="用戶 "+S.user;
+    $("chip-host").textContent="主播 "+S.host;
+    $("chip-type").textContent=(S.type==="custom"?"自建卡":"預設卡");
 
+    $("s-cell").innerHTML=hits+'<span style="font-size:13px;color:var(--on-dark-3)">/9</span>';
+    $("s-line").textContent=lines;
+    $("s-red").textContent=red;
+    $("prog").textContent=hits+" / 9 格 · "+lines+" 線";
 
-// =========================
-// 初始化
-// =========================
+    buildGrid();
 
-generateBoard();
+    $("t1").classList.toggle("on", lines>=1);
+    $("t2").classList.toggle("on", lines>=2);
+    $("t3").classList.toggle("on", hits===9);
+    $("t1-st").textContent = lines>=1 ? (S.food? "已選："+S.food : "已達成・待選主食") : "尚未達成";
+    $("t2-st").textContent = lines>=2 ? (S.drink? "已選："+S.drink : "已達成・待選飲品") : "尚未達成";
+    $("t3-st").textContent = hits===9 ? "已全連・請工作人員登記第一名與 5,000 點餐額度" : "尚未達成";
 
+    buildMenu("food-opts", FOOD, "food", S.food, lines>=1);
+    buildMenu("drink-opts", DRINK, "drink", S.drink, lines>=2);
+    $("food-note").textContent  = lines>=1 ? "已開放。選好後由主播／工作人員向櫃檯下單。" : "連 1 線後開放選擇。";
+    $("drink-note").textContent = lines>=2 ? "已開放。選好後由主播／工作人員向櫃檯下單。" : "連 2 線後開放選擇。";
+    $("in-wish").value=S.wish;
+  }
+
+  /* ============================================================
+     init
+     ============================================================ */
+  load();
+  buildCustomInputs();
+  bindGrid();
+  bindMenus();
+  render();
+
+  // 對外暴露，方便自測
+  window.__bingo = {
+    state:function(){ return S; },
+    lines:countLines, hits:countHits, LINES:LINES
+  };
+})();
 </script>
-
 </body>
 </html>

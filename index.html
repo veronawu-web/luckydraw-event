@@ -262,6 +262,35 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:rgba(2
 
     <div class="card hide" id="staff-card">
       <div class="sec-t"><h2>工作人員</h2><span class="lat">staff only</span></div>
+      <div id="staff-ops" style="margin:0 0 14px;padding-bottom:12px;border-bottom:1px dashed rgba(247,232,230,.18)">
+        <span class="lbl">餐點核銷</span>
+        <div class="team" style="gap:6px;margin-bottom:8px">
+          <span style="flex:1 1 100%;font-size:13px" id="ops-food-t">主食：—</span>
+          <button class="btn ghost mini" id="btn-food-done">核銷出餐</button>
+        </div>
+        <div class="team" style="gap:6px">
+          <span style="flex:1 1 100%;font-size:13px" id="ops-drink-t">飲品：—</span>
+          <button class="btn ghost mini" id="btn-drink-done">核銷出餐</button>
+        </div>
+
+        <div id="ops-red" style="margin-top:14px">
+          <span class="lbl">紅包獎金登記</span>
+          <div class="team" style="gap:6px;margin-bottom:8px">
+            <span style="flex:1 1 100%;font-size:13px" id="ops-red1-t">紅包 1（連 1 線）：—</span>
+            <button class="btn ghost mini" data-red="0">登記金額</button>
+          </div>
+          <div class="team" style="gap:6px;margin-bottom:8px">
+            <span style="flex:1 1 100%;font-size:13px" id="ops-red2-t">紅包 2（連 2 線）：—</span>
+            <button class="btn ghost mini" data-red="1">登記金額</button>
+          </div>
+          <div class="team" style="gap:6px">
+            <span style="flex:1 1 100%;font-size:13px" id="ops-red3-t">紅包 3（全連）：—</span>
+            <button class="btn ghost mini" data-red="2">登記金額</button>
+          </div>
+          <p class="hint" id="ops-red-sum">合計：0</p>
+        </div>
+      </div>
+
       <div class="btn-row">
         <button class="btn ghost mini" id="btn-sync">立即同步後台</button>
         <button class="btn ghost mini" id="btn-restore">從後台還原</button>
@@ -578,8 +607,11 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:rgba(2
   var FOOD = ["麻辣燙和牛牛肉麵","大紅袍炭香紅燒牛肉麵","蒜香和牛炒飯"];
   var DRINK = ["山崎焙煎樽梅酒","西班牙金星啤酒（750ml）"];
 
+  // ── 紅包金額單位（顯示用）
+  var RED_UNIT = "鑽";
+
   // ── CTA：填了才會出現。QR 由頁面自己畫，現場沒網路也掃得到
-  var LINE_URL   = "";                       // 活動 LINE@ 加入連結
+  var LINE_URL   = "https://line.me/R/ti/p/@616fbpbu";                       // 活動 LINE@ 加入連結
   var LINE_TITLE = "加入活動 LINE@ 送 2,000 鑽石";
   var LINE_NOTE  = "掃描 QR code 加入，出示加入畫面給工作人員即可領取";
   var SITE_URL   = "https://swag.live/iframe/?source=https://events.swag.app/vip_referral&title=";                       // 站內其他活動連結
@@ -602,6 +634,8 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:rgba(2
     tasks:BANK_DUO.slice(0,9),
     hits:[false,false,false,false,false,false,false,false,false],
     locked:false, food:"", drink:"", wish:"", firstAll:false,
+    foodDone:"", drinkDone:"",            // 出餐核銷時間（HH:MM）
+    red:[{amt:0,at:""},{amt:0,at:""},{amt:0,at:""}],   // 連1線／連2線／全連 的紅包
     startedAt:"", device:""
   };
   var memStore=null, memQueue=null;
@@ -632,6 +666,11 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:rgba(2
       if(typeof o.food==="string") S.food=o.food;
       if(typeof o.drink==="string") S.drink=o.drink;
       if(typeof o.wish==="string") S.wish=o.wish;
+      if(typeof o.foodDone==="string") S.foodDone=o.foodDone;
+      if(typeof o.drinkDone==="string") S.drinkDone=o.drinkDone;
+      if(Array.isArray(o.red)&&o.red.length===3) S.red=o.red.map(function(r){
+        return {amt:Number(r&&r.amt||0), at:String(r&&r.at||"")};
+      });
       if(typeof o.startedAt==="string") S.startedAt=o.startedAt;
     }catch(e){}
   }
@@ -647,6 +686,7 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:rgba(2
   function sigOf(p){
     return [p.mode,p.user,p.host,p.cardType,p.stamps,p.lines,
             p.food,p.drink,p.wish,p.fullHouse,p.mealsUnlocked,
+            p.foodDone,p.drinkDone,p.red1,p.red2,p.red3,
             (p.tasks||[]).join("|"),(p.hits||[]).join("")].join("\u0001");
   }
 
@@ -676,6 +716,9 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:rgba(2
       redEnvelopes:countRed(),
       mealsUnlocked:countMeals(),
       food:S.food, drink:S.drink, wish:S.wish,
+      foodDone:S.foodDone, drinkDone:S.drinkDone,
+      red1:Number(S.red[0].amt||0), red2:Number(S.red[1].amt||0), red3:Number(S.red[2].amt||0),
+      redTotal:Number(S.red[0].amt||0)+Number(S.red[1].amt||0)+Number(S.red[2].amt||0),
       fullHouse:hits===9?1:0,
       startedAt:S.startedAt,
       finished:hits===9?1:0
@@ -1040,6 +1083,10 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:rgba(2
         else S.tasks=presetFor(S.mode);
         if(Array.isArray(d.hits)&&d.hits.length===9) S.hits=d.hits.map(function(v){ return !!Number(v); });
         S.food=d.food||""; S.drink=d.drink||""; S.wish=d.wish||"";
+        S.foodDone=d.foodDone||""; S.drinkDone=d.drinkDone||"";
+        S.red=[{amt:Number(d.red1||0),at:d.foodDone||""},
+               {amt:Number(d.red2||0),at:d.drinkDone||""},
+               {amt:Number(d.red3||0),at:""}];
         S.startedAt=d.startedAt||""; S.locked=true;
         S.firstAll=countHits()===9;
         save(); render();
@@ -1076,6 +1123,61 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:rgba(2
     gate.addEventListener("pointerleave", stop);
     gate.addEventListener("contextmenu", function(e){ e.preventDefault(); });
   })();
+
+  function fmtAmt(n){ return String(Number(n||0)).replace(/\B(?=(\d{3})+(?!\d))/g, ","); }
+
+  $("btn-food-done").addEventListener("click", function(){
+    if(!S.food){ toast("用戶還沒選主食"); return; }
+    if(S.foodDone){ toast("主食已核銷（"+S.foodDone+"），長按此鈕可取消"); return; }
+    S.foodDone=hhmm(); save(); render(); syncNow(true); toast("主食已核銷出餐");
+  });
+  $("btn-drink-done").addEventListener("click", function(){
+    if(!S.drink){ toast("用戶還沒選飲品"); return; }
+    if(S.drinkDone){ toast("飲品已核銷（"+S.drinkDone+"），長按此鈕可取消"); return; }
+    S.drinkDone=hhmm(); save(); render(); syncNow(true); toast("飲品已核銷出餐");
+  });
+
+  // 長按取消餐點核銷（誤按用）
+  (function(){
+    function bindUndo(id, key, label){
+      var t=null, el=$(id);
+      el.addEventListener("pointerdown", function(){
+        if(t) clearTimeout(t);
+        t=setTimeout(function(){
+          if(!S[key]) return;
+          ask({title:"取消"+label+"核銷？", body:"原核銷時間 "+S[key]+" 會被清掉。", ok:"取消核銷"},
+          function(ok){ if(!ok) return; S[key]=""; save(); render(); syncNow(true); toast(label+"核銷已取消"); });
+        }, 700);
+      });
+      el.addEventListener("pointerup", function(){ if(t){ clearTimeout(t); t=null; } });
+      el.addEventListener("pointerleave", function(){ if(t){ clearTimeout(t); t=null; } });
+    }
+    bindUndo("btn-food-done","foodDone","主食");
+    bindUndo("btn-drink-done","drinkDone","飲品");
+  })();
+
+  // 紅包登記
+  $("ops-red").addEventListener("click", function(e){
+    var btn=e.target.closest("[data-red]"); if(!btn) return;
+    var i=parseInt(btn.getAttribute("data-red"),10);
+    var names=["紅包 1（連 1 線）","紅包 2（連 2 線）","紅包 3（全連）"];
+    var lines=countLines(), hits=countHits();
+    var earned = i===0 ? lines>=1 : (i===1 ? lines>=2 : hits===9);
+    ask({
+      title:names[i]+" 金額",
+      body:(earned? "這個紅包已達成，請填入實際抽到的金額。" : "⚠️ 這個紅包尚未達成（可先登記，但請確認）。")+
+           "\n單位："+RED_UNIT+"　填 0 ＝ 清除登記。",
+      input:true, placeholder:"金額（數字）", ok:"登記"
+    }, function(ok,val){
+      if(!ok) return;
+      var v=String(val).replace(/[^0-9]/g,"");
+      if(v===""){ toast("請輸入數字"); return; }
+      var amt=Number(v);
+      S.red[i]={amt:amt, at: amt>0 ? hhmm() : ""};
+      save(); render(); syncNow(true);
+      toast(amt>0 ? (names[i]+"："+fmtAmt(amt)+" "+RED_UNIT+" 已登記") : (names[i]+" 登記已清除"));
+    });
+  });
 
   $("btn-staff-close").addEventListener("click", function(){
     setStaffPanel(false); toast("面板已關閉，可交給用戶");
@@ -1118,7 +1220,9 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:rgba(2
       picked=[];
       S={mode:"duo",user:"",host:"",type:"preset",tasks:BANK_DUO.slice(0,9),
          hits:[false,false,false,false,false,false,false,false,false],
-         locked:false,food:"",drink:"",wish:"",firstAll:false,startedAt:"",device:deviceId()};
+         locked:false,food:"",drink:"",wish:"",firstAll:false,
+         foodDone:"",drinkDone:"",red:[{amt:0,at:""},{amt:0,at:""},{amt:0,at:""}],
+         startedAt:"",device:deviceId()};
       setStaffPanel(false);
       save(); render(); toast("已清除，面板已關閉，可交給下一位");
     });
@@ -1135,8 +1239,10 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:rgba(2
       "用戶："+S.user+(S.mode==="solo"?"":"　主播："+S.host)+"\n"+
       "卡片："+(S.type==="pick"?"自選卡":"預設卡")+"\n"+
       "蓋章："+hits+"/9　連線："+lines+" 線\n"+
-      "主食："+(S.food||"—")+"\n"+
-      "飲品："+(S.drink||"—")+"\n"+
+      "主食："+(S.food||"—")+(S.foodDone?"（已出餐 "+S.foodDone+"）":"（未出餐）")+"\n"+
+      "飲品："+(S.drink||"—")+(S.drinkDone?"（已出餐 "+S.drinkDone+"）":"（未出餐）")+"\n"+
+      (solo ? "" : "紅包："+fmtAmt(S.red[0].amt)+" / "+fmtAmt(S.red[1].amt)+" / "+fmtAmt(S.red[2].amt)+
+              "　合計 "+fmtAmt(Number(S.red[0].amt)+Number(S.red[1].amt)+Number(S.red[2].amt))+" "+RED_UNIT+"\n")+
       (solo ? "已解鎖餐點："+countMeals()+" 項\n" : "可抽紅包："+red+" 次\n")+
       "全連："+(hits===9?(solo?"是（單人軌）":"是（需登記是否第一名／5,000 點餐額度）"):"否")+"\n"+
       "許願："+(S.wish||"—")+"\n"+
@@ -1235,10 +1341,20 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:rgba(2
     $("t1").classList.toggle("on",lines>=1);
     $("t2").classList.toggle("on",lines>=2);
     $("t3").classList.toggle("on",hits===9);
-    $("t1-st").textContent = lines>=1 ? (S.food?"已選："+S.food:"已達成・待選主食") : "尚未達成";
-    $("t2-st").textContent = lines>=2 ? (S.drink?"已選："+S.drink:"已達成・待選飲品") : "尚未達成";
+    var r1=Number(S.red[0].amt||0), r2=Number(S.red[1].amt||0), r3=Number(S.red[2].amt||0);
+    $("t1-st").textContent = lines>=1
+      ? (S.food ? ("已選："+S.food + (S.foodDone?"・已出餐 "+S.foodDone:"・待出餐")
+                  + (!solo && r1>0 ? "・紅包 "+fmtAmt(r1)+" "+RED_UNIT : ""))
+                : "已達成・待選主食")
+      : "尚未達成";
+    $("t2-st").textContent = lines>=2
+      ? (S.drink ? ("已選："+S.drink + (S.drinkDone?"・已出餐 "+S.drinkDone:"・待出餐")
+                    + (!solo && r2>0 ? "・紅包 "+fmtAmt(r2)+" "+RED_UNIT : ""))
+                 : "已達成・待選飲品")
+      : "尚未達成";
     $("t3-st").textContent = hits===9
-      ? (solo ? "已完成全部 9 格" : "已全連・請工作人員登記第一名與 5,000 點餐額度")
+      ? (solo ? "已完成全部 9 格"
+              : "已全連・請登記第一名與 5,000 點餐額度" + (r3>0 ? "・紅包 "+fmtAmt(r3)+" "+RED_UNIT : ""))
       : "尚未達成";
 
     var rTail = solo ? "" : " ＋抽紅包 ×1";
@@ -1254,6 +1370,19 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:rgba(2
     buildMenu("drink-opts",DRINK,"drink",S.drink,lines>=2);
     $("food-note").textContent  = lines>=1 ? "已開放。選好後由主播／工作人員向櫃檯下單。" : "連 1 線後開放選擇。";
     $("drink-note").textContent = lines>=2 ? "已開放。選好後由主播／工作人員向櫃檯下單。" : "連 2 線後開放選擇。";
+    // 工作人員面板：餐點與紅包
+    $("ops-food-t").textContent  = "主食：" + (S.food || "—") + (S.foodDone ? "　✅ 已出餐 "+S.foodDone : "");
+    $("ops-drink-t").textContent = "飲品：" + (S.drink || "—") + (S.drinkDone ? "　✅ 已出餐 "+S.drinkDone : "");
+    $("ops-red").classList.toggle("hide", solo);
+    if(!solo){
+      var labels=["紅包 1（連 1 線）","紅包 2（連 2 線）","紅包 3（全連）"], tot=0;
+      for(var ri=0;ri<3;ri++){
+        var r=S.red[ri], amt=Number(r.amt||0); tot+=amt;
+        $("ops-red"+(ri+1)+"-t").textContent = labels[ri]+"："+(amt>0 ? fmtAmt(amt)+" "+RED_UNIT+"（"+r.at+"）" : "—");
+      }
+      $("ops-red-sum").textContent = "合計："+fmtAmt(tot)+" "+RED_UNIT;
+    }
+
     $("in-wish").value=S.wish;
     $("wish-note").textContent = S.wish ? ("已送出："+S.wish) : "寫好後按「送出」，主辦才收得到。";
     buildCTA();

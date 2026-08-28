@@ -11,7 +11,7 @@
 :root{
   --ink-black:#0D090B; --wine:#3A101D; --burgundy:#5A182B;
   --hot:#E63D88; --bubble:#F27BAB; --powder:#F5C4D4; --cream:#F7E8E6;
-  --gold:#E9B44C;
+  --gold:#E9B44C; --ok:#4FB783; --warn:#E9B44C; --err:#C0344F;
   --paper-ink:#3A101D; --paper-ink-2:#7a4457;
   --on-dark:#F7E8E6; --on-dark-2:rgba(247,232,230,.66); --on-dark-3:rgba(247,232,230,.42);
   --serif:'Cormorant Garamond','Noto Serif TC',Georgia,serif;
@@ -26,24 +26,18 @@ body{
   background:
     radial-gradient(120% 60% at 50% 0%, #4a1526 0%, rgba(74,21,38,0) 60%),
     linear-gradient(180deg,#160A10 0%, var(--ink-black) 45%, #14090E 100%);
-  color:var(--on-dark); font-family:var(--sans);
-  min-height:100vh; -webkit-text-size-adjust:100%;
+  color:var(--on-dark); font-family:var(--sans); min-height:100vh; -webkit-text-size-adjust:100%;
 }
 .wrap{max-width:var(--maxw);margin:0 auto;padding:0 16px 140px}
 
-/* ── header ─────────────────────────────── */
-header.top{padding:26px 0 14px;text-align:center;position:relative}
+header.top{padding:26px 0 14px;text-align:center}
 .eyebrow{font-family:var(--cond);font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--on-dark-3);margin:0 0 8px}
 h1{font-family:var(--cjk);font-weight:600;font-size:26px;letter-spacing:.06em;margin:0 0 6px;line-height:1.25}
 .meta{font-size:12.5px;color:var(--on-dark-2);margin:0;line-height:1.7}
 .meta b{color:var(--powder);font-weight:500}
 
-/* ── cards ──────────────────────────────── */
-.card{
-  background:linear-gradient(180deg, rgba(247,232,230,.055), rgba(247,232,230,.025));
-  border:1px solid rgba(247,232,230,.14); border-radius:14px;
-  padding:16px; margin:14px 0;
-}
+.card{background:linear-gradient(180deg, rgba(247,232,230,.055), rgba(247,232,230,.025));
+  border:1px solid rgba(247,232,230,.14);border-radius:14px;padding:16px;margin:14px 0}
 .card.paper{background:linear-gradient(180deg,#F9EFEC,#F3E2DE);border-color:rgba(58,16,29,.18);color:var(--paper-ink)}
 .card.paper .lbl,.card.paper .hint{color:var(--paper-ink-2)}
 .sec-t{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin:0 0 12px}
@@ -52,70 +46,54 @@ h1{font-family:var(--cjk);font-weight:600;font-size:26px;letter-spacing:.06em;ma
 .card.paper .sec-t .lat{color:var(--paper-ink-2)}
 .lbl{display:block;font-family:var(--cond);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--on-dark-3);margin:0 0 6px}
 .hint{font-size:12px;color:var(--on-dark-2);line-height:1.65;margin:8px 0 0}
-.inp{
-  width:100%;padding:11px 12px;border-radius:9px;font:inherit;font-size:15px;
-  background:rgba(13,9,11,.5);border:1px solid rgba(247,232,230,.2);color:var(--on-dark);
-}
+.inp{width:100%;padding:11px 12px;border-radius:9px;font:inherit;font-size:15px;
+  background:rgba(13,9,11,.5);border:1px solid rgba(247,232,230,.2);color:var(--on-dark)}
 .card.paper .inp{background:#fff;border-color:rgba(58,16,29,.2);color:var(--paper-ink)}
 .inp:focus{outline:2px solid var(--hot);outline-offset:1px}
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-@media (max-width:380px){.row2{grid-template-columns:1fr}}
+@media (max-width:390px){.row2{grid-template-columns:1fr}}
 
-/* ── buttons ────────────────────────────── */
-.btn{
-  display:inline-flex;align-items:center;justify-content:center;gap:8px;
-  width:100%;padding:13px 16px;border-radius:999px;border:0;cursor:pointer;
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;width:100%;
+  padding:13px 16px;border-radius:999px;border:0;cursor:pointer;
   font-family:var(--cond);font-size:14px;font-weight:500;letter-spacing:.1em;
-  background:linear-gradient(180deg,var(--hot),#c92e73);color:#fff;
-}
+  background:linear-gradient(180deg,var(--hot),#c92e73);color:#fff}
 .btn:active{transform:translateY(1px)}
 .btn.ghost{background:transparent;border:1px solid rgba(247,232,230,.28);color:var(--on-dark)}
 .btn.mini{width:auto;padding:8px 14px;font-size:12px}
 .btn[disabled]{opacity:.42;cursor:not-allowed}
 .btn-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
 
-/* ── team strip ─────────────────────────── */
-.team{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:13px}
-.chip{
-  display:inline-flex;align-items:center;gap:6px;padding:6px 11px;border-radius:999px;
+.team{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:13px}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:6px 11px;border-radius:999px;
   background:rgba(230,61,136,.14);border:1px solid rgba(230,61,136,.4);
-  font-family:var(--cond);font-size:12px;letter-spacing:.06em;
-}
+  font-family:var(--cond);font-size:12px;letter-spacing:.06em}
 .chip.gold{background:rgba(233,180,76,.14);border-color:rgba(233,180,76,.45);color:var(--gold)}
+.chip.sync{background:rgba(79,183,131,.12);border-color:rgba(79,183,131,.4);color:var(--ok)}
+.chip.sync.warn{background:rgba(233,180,76,.12);border-color:rgba(233,180,76,.45);color:var(--warn)}
+.chip.sync.err{background:rgba(192,52,79,.14);border-color:rgba(192,52,79,.5);color:#F09BAB}
 
-/* ── status bar ─────────────────────────── */
 .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0 0}
 .stat{background:rgba(13,9,11,.45);border:1px solid rgba(247,232,230,.12);border-radius:10px;padding:10px 8px;text-align:center}
 .stat .n{font-family:var(--cond);font-size:22px;font-weight:500;line-height:1;color:var(--powder)}
 .stat .k{font-size:10.5px;letter-spacing:.1em;color:var(--on-dark-3);margin-top:5px}
 
-/* ── grid ───────────────────────────────── */
-.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:4px 0 0}
-.cell{
-  position:relative;aspect-ratio:1;border-radius:11px;cursor:pointer;
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.cell{position:relative;aspect-ratio:1;border-radius:11px;cursor:pointer;
   background:#FBF3F0;border:1px solid rgba(58,16,29,.22);color:var(--paper-ink);
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  padding:8px 7px;text-align:center;font-family:var(--cjk);font-size:12.5px;line-height:1.4;
-  transition:transform .12s ease, background .15s ease;
-}
+  display:flex;align-items:center;justify-content:center;padding:9px 7px;text-align:center;
+  font-family:var(--cjk);font-size:12px;line-height:1.4;transition:transform .12s ease, background .15s ease}
 .cell .no{position:absolute;top:5px;left:7px;font-family:var(--cond);font-size:10px;color:var(--paper-ink-2);opacity:.7}
 .cell .tx{max-height:100%;overflow:hidden}
 .cell.hit{background:linear-gradient(180deg,var(--hot),#cf3479);color:#fff;border-color:var(--hot)}
 .cell.hit .no{color:rgba(255,255,255,.75)}
-.cell.hit::after{
-  content:"✓";position:absolute;right:6px;bottom:4px;font-family:var(--cond);font-size:13px;opacity:.9
-}
-.cell.locked{cursor:not-allowed;opacity:.96}
+.cell.hit::after{content:"✓";position:absolute;right:6px;bottom:4px;font-family:var(--cond);font-size:13px;opacity:.9}
 .cell.final{box-shadow:0 0 0 2px var(--gold) inset}
 .cell:active{transform:scale(.97)}
 
-/* ── lines / rewards ────────────────────── */
 .tier{display:flex;gap:10px;align-items:flex-start;padding:11px 0;border-bottom:1px dashed rgba(58,16,29,.18)}
 .tier:last-child{border-bottom:0}
-.tier .tag{
-  flex:0 0 auto;font-family:var(--cond);font-size:11px;letter-spacing:.08em;
-  padding:5px 9px;border-radius:6px;background:rgba(58,16,29,.08);border:1px solid rgba(58,16,29,.18)
-}
+.tier .tag{flex:0 0 auto;font-family:var(--cond);font-size:11px;letter-spacing:.08em;
+  padding:5px 9px;border-radius:6px;background:rgba(58,16,29,.08);border:1px solid rgba(58,16,29,.18)}
 .tier.on .tag{background:var(--hot);border-color:var(--hot);color:#fff}
 .tier .tx{font-size:13px;line-height:1.6}
 .tier .tx b{font-family:var(--cjk);font-weight:600}
@@ -124,44 +102,36 @@ h1{font-family:var(--cjk);font-weight:600;font-size:26px;letter-spacing:.06em;ma
 
 .menu{margin-top:12px}
 .menu h5{font-family:var(--cjk);font-size:13px;margin:0 0 8px;font-weight:600}
-.opt{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:9px;border:1px solid rgba(58,16,29,.16);margin:0 0 7px;font-size:13.5px;cursor:pointer;background:#fff}
+.opt{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:9px;
+  border:1px solid rgba(58,16,29,.16);margin:0 0 7px;font-size:13.5px;cursor:pointer;background:#fff}
 .opt input{accent-color:var(--hot);width:17px;height:17px;flex:0 0 auto}
 .opt.sel{border-color:var(--hot);background:rgba(230,61,136,.07)}
-fieldset[disabled] .opt,.locked-menu .opt{opacity:.5;cursor:not-allowed}
-.locked-note{font-size:12px;color:var(--paper-ink-2);margin:6px 0 0}
+.locked-menu .opt{opacity:.5;cursor:not-allowed}
+.locked-note{font-size:12px;color:var(--paper-ink-2);margin:6px 0 0;line-height:1.6}
+.card .opt{background:rgba(13,9,11,.4);border-color:rgba(247,232,230,.18);color:var(--on-dark)}
+.card .opt.sel{border-color:var(--hot);background:rgba(230,61,136,.14)}
 
-/* ── toast / dialog ─────────────────────── */
-.toast{
-  position:fixed;left:50%;bottom:96px;transform:translateX(-50%) translateY(12px);
+.toast{position:fixed;left:50%;bottom:96px;transform:translateX(-50%) translateY(12px);
   background:rgba(13,9,11,.94);border:1px solid rgba(247,232,230,.2);color:var(--on-dark);
-  padding:11px 16px;border-radius:999px;font-size:13px;z-index:60;
-  opacity:0;pointer-events:none;transition:opacity .2s ease, transform .2s ease;max-width:88vw;text-align:center
-}
+  padding:11px 16px;border-radius:999px;font-size:13px;z-index:60;opacity:0;pointer-events:none;
+  transition:opacity .2s ease, transform .2s ease;max-width:88vw;text-align:center}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-dialog{
-  border:0;padding:0;background:transparent;max-width:400px;width:calc(100% - 32px);
-}
+dialog{border:0;padding:0;background:transparent;max-width:400px;width:calc(100% - 32px)}
 dialog::backdrop{background:rgba(9,5,7,.72)}
 .modal{background:#F9EFEC;color:var(--paper-ink);border-radius:14px;padding:20px}
 .modal h3{font-family:var(--cjk);font-size:17px;margin:0 0 8px}
-.modal p{font-size:13.5px;line-height:1.7;margin:0 0 14px;color:var(--paper-ink-2)}
-.modal .inp{margin-bottom:12px}
+.modal p{font-size:13.5px;line-height:1.7;margin:0 0 14px;color:var(--paper-ink-2);white-space:pre-wrap}
+.modal .inp{margin-bottom:12px;background:#fff;border-color:rgba(58,16,29,.2);color:var(--paper-ink)}
 .modal .btn.ghost{border-color:rgba(58,16,29,.28);color:var(--paper-ink)}
 
-/* ── sticky footer ──────────────────────── */
-.sticky{
-  position:fixed;left:0;right:0;bottom:0;z-index:50;
+.sticky{position:fixed;left:0;right:0;bottom:0;z-index:50;
   background:linear-gradient(180deg,rgba(13,9,11,0),rgba(13,9,11,.94) 34%);
-  padding:16px;padding-bottom:max(16px,env(safe-area-inset-bottom));
-}
+  padding:16px;padding-bottom:max(16px,env(safe-area-inset-bottom))}
 .sticky .in{max-width:var(--maxw);margin:0 auto;display:flex;gap:8px;align-items:center}
 .sticky .prog{flex:1;font-family:var(--cond);font-size:12px;letter-spacing:.08em;color:var(--on-dark-2)}
 .hide{display:none !important}
 .foot{text-align:center;font-family:var(--cond);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--on-dark-3);padding:8px 0 0}
-.draft{
-  display:inline-block;font-family:var(--cond);font-size:10px;letter-spacing:.12em;
-  color:var(--gold);border:1px solid rgba(233,180,76,.5);border-radius:5px;padding:2px 6px;margin-left:6px
-}
+code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:rgba(247,232,230,.1);padding:1px 5px;border-radius:4px}
 </style>
 </head>
 <body>
@@ -171,18 +141,23 @@ dialog::backdrop{background:rgba(9,5,7,.72)}
   <header class="top">
     <p class="eyebrow">Main Game · 8/29 oncor 信義店</p>
     <h1>女神點唱 BINGO</h1>
-    <p class="meta">3×3 九格・主播 × 用戶組隊・<b>網頁版現場核銷</b><br />每完成一格，由主播或工作人員蓋章</p>
+    <p class="meta">3×3 九格・<b>網頁版現場核銷</b><br />每完成一格，由主播或工作人員蓋章</p>
   </header>
 
-  <!-- ===== STEP 1：組隊 ＋ 選卡 ===== -->
+  <!-- ===== STEP 1 ===== -->
   <section class="card" id="setup">
-    <div class="sec-t"><h2>組隊登記</h2><span class="lat">step 1</span></div>
-    <div class="row2">
+    <div class="sec-t"><h2>報到登記</h2><span class="lat">step 1</span></div>
+
+    <span class="lbl">參加形式</span>
+    <label class="opt sel" id="opt-duo"><input type="radio" name="mode" value="duo" checked /><span>1v1 組隊（主播 × 用戶）</span></label>
+    <label class="opt" id="opt-solo"><input type="radio" name="mode" value="solo" /><span>單人闖關（自己來的用戶）</span></label>
+
+    <div style="margin-top:16px" class="row2">
       <div>
         <span class="lbl">用戶帳號</span>
         <input class="inp" id="in-user" type="text" placeholder="SWAG 帳號" autocomplete="off" />
       </div>
-      <div>
+      <div id="host-wrap">
         <span class="lbl">組隊主播</span>
         <input class="inp" id="in-host" type="text" placeholder="主播帳號" autocomplete="off" />
       </div>
@@ -191,29 +166,31 @@ dialog::backdrop{background:rgba(9,5,7,.72)}
     <div style="margin-top:16px">
       <span class="lbl">卡片類型</span>
       <label class="opt sel" id="opt-preset"><input type="radio" name="ctype" value="preset" checked /><span>預設卡（9 格已排好）</span></label>
-      <label class="opt" id="opt-custom"><input type="radio" name="ctype" value="custom" /><span>自建卡（用戶＋主播現場填 9 格）</span></label>
+      <label class="opt" id="opt-custom"><input type="radio" name="ctype" value="custom" /><span>自建卡（現場自己填 9 格）</span></label>
     </div>
 
     <div id="custom-box" class="hide" style="margin-top:14px">
-      <span class="lbl">自建 9 格任務<span class="draft">不可重複</span></span>
+      <span class="lbl">自建 9 格任務・不可重複</span>
       <div id="custom-inputs"></div>
     </div>
 
     <div class="btn-row">
       <button class="btn" id="btn-lock">鎖定卡片・開始遊戲</button>
+      <button class="btn ghost mini" id="btn-restore-2">已經玩過了？從後台還原進度</button>
     </div>
-    <p class="hint">鎖卡後任務內容不可再改（可由工作人員解鎖）。進度存在這台裝置，重新整理不會消失。</p>
+    <p class="hint">鎖卡後任務不可改（工作人員可解鎖）。進度存這台裝置，重整不會消失，並會自動回傳後台。<br />用戶誤關網頁或換裝置時，用上面的「從後台還原進度」＋帳號即可接回。</p>
   </section>
 
-  <!-- ===== STEP 2：卡片 ===== -->
+  <!-- ===== STEP 2 ===== -->
   <section id="game" class="hide">
 
     <div class="card">
       <div class="team">
         <span class="chip" id="chip-user">用戶</span>
-        <span style="color:var(--on-dark-3)">×</span>
+        <span id="chip-x" style="color:var(--on-dark-3)">×</span>
         <span class="chip" id="chip-host">主播</span>
         <span class="chip gold" id="chip-type">預設卡</span>
+        <span class="chip sync" id="chip-sync">未連線後台</span>
       </div>
       <div class="stats">
         <div class="stat"><div class="n" id="s-cell">0<span style="font-size:13px;color:var(--on-dark-3)">/9</span></div><div class="k">已蓋章</div></div>
@@ -225,12 +202,11 @@ dialog::backdrop{background:rgba(9,5,7,.72)}
     <div class="card paper">
       <div class="sec-t"><h2>任務卡</h2><span class="lat">tap to stamp</span></div>
       <div class="grid" id="grid"></div>
-      <p class="locked-note">點格子＝蓋章。第 9 格（最後一格）需<b>工作人員輸入現場碼</b>核銷。誤按可長按格子取消。</p>
+      <p class="locked-note">點格子＝蓋章。<b>第 9 格（最後一格）需工作人員輸入現場碼</b>核銷。誤按可長按格子取消。</p>
     </div>
 
     <div class="card paper">
       <div class="sec-t"><h2>連線獎勵</h2><span class="lat">rewards</span></div>
-
       <div class="tier" id="t1">
         <span class="tag">連 1 線</span>
         <span class="tx"><b>選 1 份主食（5 選 1）</b> ＋抽紅包 ×1<br /><span class="st" id="t1-st">尚未達成</span></span>
@@ -244,32 +220,21 @@ dialog::backdrop{background:rgba(9,5,7,.72)}
         <span class="tx"><b>第一名 5,000 點餐額度</b> ＋抽紅包 ×1<br /><span class="st" id="t3-st">尚未達成</span></span>
       </div>
 
-      <div class="menu" id="menu-food">
-        <h5>主食 5 選 1</h5>
-        <div id="food-opts"></div>
-        <p class="locked-note" id="food-note">連 1 線後開放選擇。</p>
-      </div>
-
-      <div class="menu" id="menu-drink">
-        <h5>飲品 3 選 1</h5>
-        <div id="drink-opts"></div>
-        <p class="locked-note" id="drink-note">連 2 線後開放選擇。</p>
-      </div>
-
-      <div class="menu">
-        <h5>向主辦許願（選填）</h5>
-        <input class="inp" id="in-wish" type="text" maxlength="60" placeholder="想吃想喝的、或任何想說的話" />
-      </div>
+      <div class="menu"><h5>主食 5 選 1</h5><div id="food-opts"></div><p class="locked-note" id="food-note">連 1 線後開放選擇。</p></div>
+      <div class="menu"><h5>飲品 3 選 1</h5><div id="drink-opts"></div><p class="locked-note" id="drink-note">連 2 線後開放選擇。</p></div>
+      <div class="menu"><h5>向主辦許願（選填）</h5><input class="inp" id="in-wish" type="text" maxlength="60" placeholder="想吃想喝的、或任何想說的話" /></div>
     </div>
 
     <div class="card">
       <div class="sec-t"><h2>工作人員</h2><span class="lat">staff only</span></div>
       <div class="btn-row">
-        <button class="btn ghost mini" id="btn-summary">產出這組結算摘要</button>
+        <button class="btn ghost mini" id="btn-sync">立即同步後台</button>
+        <button class="btn ghost mini" id="btn-restore">從後台還原</button>
+        <button class="btn ghost mini" id="btn-summary">結算摘要</button>
         <button class="btn ghost mini" id="btn-unlock">解鎖卡片</button>
         <button class="btn ghost mini" id="btn-reset">換下一位（清除本機）</button>
       </div>
-      <p class="hint">現場碼預設 <b>0829</b>，可在檔案第一段 <code>STAFF_CODE</code> 修改。摘要會顯示可複製的文字，供核銷名單登記。</p>
+      <p class="hint">現場碼預設 <code>0829</code>（檔案內 <code>STAFF_CODE</code>）。後台網址填在 <code>GAS_URL</code>；沒填或斷網時會存成待送佇列，恢復後自動補送。</p>
     </div>
 
   </section>
@@ -277,7 +242,6 @@ dialog::backdrop{background:rgba(9,5,7,.72)}
   <p class="foot">SWAG · 8 月女神聚會 · oncor 信義店 · 8/29（六）</p>
 </div>
 
-<!-- sticky -->
 <div class="sticky hide" id="sticky">
   <div class="in">
     <span class="prog" id="prog">0 / 9 格 · 0 線</span>
@@ -291,7 +255,7 @@ dialog::backdrop{background:rgba(9,5,7,.72)}
   <form class="modal" method="dialog" id="dlg-form">
     <h3 id="dlg-t">確認</h3>
     <p id="dlg-p"></p>
-    <input class="inp hide" id="dlg-in" type="text" inputmode="numeric" autocomplete="off" />
+    <input class="inp hide" id="dlg-in" type="text" autocomplete="off" />
     <div style="display:flex;gap:8px">
       <button class="btn ghost" value="cancel" type="submit">取消</button>
       <button class="btn" value="ok" type="submit" id="dlg-ok">確認</button>
@@ -304,85 +268,199 @@ dialog::backdrop{background:rgba(9,5,7,.72)}
   "use strict";
 
   /* ============================================================
-     可調參數
+     ① 上線前要改的三個常數
      ============================================================ */
-  var STAFF_CODE = "0829";          // 工作人員現場碼
-  var STORE_KEY  = "swag_bingo_0829_v1";
+  // 工作人員現場碼
+  var STAFF_CODE = "0829";
 
-  // 預設卡 9 格任務（草稿，現場可改：直接改這裡的文字）
-  var PRESET = [
-    "與女神合唱一首經典國語歌",
-    "女神點一首歌，用戶唱副歌",
-    "用戶點一首女神沒聽過的歌",
-    "找另一組一起合唱一首（4 人）",
-    "猜歌前奏，答對 1 題",
-    "與女神合拍一張同框照",
-    "與另一組交換點一首歌",
-    "全場大合唱時一起舉手同框",
-    "女神指定一首歌，用戶完整唱完"
-  ];
+  // Google Apps Script 部署網址（/exec 結尾）。留空＝只存本機、不回傳。
+  var GAS_URL = "";
 
-  var FOOD = [
-    "麻辣燙和牛牛肉麵",
-    "大紅袍炭香紅燒牛肉麵",
-    "韓式碳烤帶骨牛小排包生菜",
-    "韓式醬烤豬五花包生菜",
-    "蒜香和牛炒飯"
-  ];
-  var DRINK = [
-    "山崎焙煎樽梅酒",
-    "西班牙金星啤酒（750ml）",
-    "日式清酒蛤蠣湯 ×2"
-  ];
-
-  // 8 條線（3 橫 3 直 2 斜）
-  var LINES = [
-    [0,1,2],[3,4,5],[6,7,8],
-    [0,3,6],[1,4,7],[2,5,8],
-    [0,4,8],[2,4,6]
-  ];
+  // 這台裝置的代號（多台平板時方便對帳，可留空自動產生）
+  var DEVICE_ID = "";
 
   /* ============================================================
-     狀態 ＋ 存檔（localStorage，失敗則退回記憶體）
+     ② 任務卡（現場要改直接改這兩個陣列）
      ============================================================ */
-  var mem = null;
-  var S = {
-    user:"", host:"", type:"preset",
-    tasks:PRESET.slice(),
-    hits:[false,false,false,false,false,false,false,false,false],
-    locked:false, food:"", drink:"", wish:"",
-    firstAll:false            // 是否已由工作人員登記全連
-  };
 
-  function save(){
-    var raw = JSON.stringify(S);
-    mem = raw;
-    try{ localStorage.setItem(STORE_KEY, raw); }catch(e){}
+  // 1v1 組隊卡：主播 × 用戶一起完成
+  var PRESET_DUO = [
+    "合唱一首歌的副歌",
+    "互相幫對方點一首歌，各唱一段",
+    "默契題：主播出 3 題，用戶答對 2 題",
+    "挑一首比你們年紀大的歌，唱完一段",
+    "找另一組合唱一首，四人同框",
+    "猜歌前奏，你們這組答對 1 題",
+    "麥克風接力：一人一句唱完一段不中斷",
+    "別組表演時當應援團，完整一首",
+    "拍一張兩人合照（可用道具）"
+  ];
+
+  // 單人闖關卡：不需要固定主播，靠自己＋現場其他人
+  var PRESET_SOLO = [
+    "拿麥克風說出你的 ID ＋ 今天最想聽的歌",
+    "獨唱一首完整的歌",
+    "幫任一位主播點一首她會唱的歌",
+    "找另一位單人參加者組隊唱一首",
+    "猜歌前奏，答對 1 題",
+    "找工作人員或主持人合唱一首",
+    "別人表演時上前應援，完整一首",
+    "跟任一組交換一個「今天才知道的事」",
+    "全場大合唱時入鏡合照"
+  ];
+
+  var FOOD = ["麻辣燙和牛牛肉麵","大紅袍炭香紅燒牛肉麵","韓式碳烤帶骨牛小排包生菜","韓式醬烤豬五花包生菜","蒜香和牛炒飯"];
+  var DRINK = ["山崎焙煎樽梅酒","西班牙金星啤酒（750ml）","日式清酒蛤蠣湯 ×2"];
+
+  var LINES = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+  var STORE_KEY = "swag_bingo_0829_v2";
+  var QUEUE_KEY = "swag_bingo_0829_queue";
+  var DEV_KEY   = "swag_bingo_0829_device";
+
+  /* ============================================================
+     狀態
+     ============================================================ */
+  var S = {
+    mode:"duo", user:"", host:"", type:"preset",
+    tasks:PRESET_DUO.slice(),
+    hits:[false,false,false,false,false,false,false,false,false],
+    locked:false, food:"", drink:"", wish:"", firstAll:false,
+    startedAt:"", device:""
+  };
+  var memStore=null, memQueue=null;
+
+  function lsGet(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
+  function lsSet(k,v){ try{ localStorage.setItem(k,v); }catch(e){} }
+  function lsDel(k){ try{ localStorage.removeItem(k); }catch(e){} }
+
+  function deviceId(){
+    if(DEVICE_ID) return DEVICE_ID;
+    var d=lsGet(DEV_KEY);
+    if(!d){ d="dev-"+Math.random().toString(36).slice(2,7); lsSet(DEV_KEY,d); }
+    return d;
   }
+
+  function save(){ var raw=JSON.stringify(S); memStore=raw; lsSet(STORE_KEY,raw); }
   function load(){
-    var raw = null;
-    try{ raw = localStorage.getItem(STORE_KEY); }catch(e){}
-    if(!raw) raw = mem;
-    if(!raw) return;
+    var raw=lsGet(STORE_KEY)||memStore; if(!raw) return;
     try{
-      var o = JSON.parse(raw);
-      if(o && typeof o === "object"){
-        if(typeof o.user==="string") S.user=o.user;
-        if(typeof o.host==="string") S.host=o.host;
-        if(o.type==="custom"||o.type==="preset") S.type=o.type;
-        if(Array.isArray(o.tasks)&&o.tasks.length===9) S.tasks=o.tasks.map(String);
-        if(Array.isArray(o.hits)&&o.hits.length===9) S.hits=o.hits.map(Boolean);
-        S.locked=!!o.locked; S.firstAll=!!o.firstAll;
-        if(typeof o.food==="string") S.food=o.food;
-        if(typeof o.drink==="string") S.drink=o.drink;
-        if(typeof o.wish==="string") S.wish=o.wish;
-      }
+      var o=JSON.parse(raw); if(!o||typeof o!=="object") return;
+      if(o.mode==="solo"||o.mode==="duo") S.mode=o.mode;
+      if(typeof o.user==="string") S.user=o.user;
+      if(typeof o.host==="string") S.host=o.host;
+      if(o.type==="custom"||o.type==="preset") S.type=o.type;
+      if(Array.isArray(o.tasks)&&o.tasks.length===9) S.tasks=o.tasks.map(String);
+      if(Array.isArray(o.hits)&&o.hits.length===9) S.hits=o.hits.map(Boolean);
+      S.locked=!!o.locked; S.firstAll=!!o.firstAll;
+      if(typeof o.food==="string") S.food=o.food;
+      if(typeof o.drink==="string") S.drink=o.drink;
+      if(typeof o.wish==="string") S.wish=o.wish;
+      if(typeof o.startedAt==="string") S.startedAt=o.startedAt;
     }catch(e){}
   }
-  function clearStore(){
-    mem = null;
-    try{ localStorage.removeItem(STORE_KEY); }catch(e){}
+
+  /* ============================================================
+     GAS 同步：debounce ＋ 離線佇列
+     ============================================================ */
+  var syncState="idle";   // idle | pending | sending | done | queued | off
+  var syncT=null, lastSentAt="";
+
+  function queueRead(){
+    var raw=lsGet(QUEUE_KEY)||memQueue;
+    if(!raw) return [];
+    try{ var a=JSON.parse(raw); return Array.isArray(a)?a:[]; }catch(e){ return []; }
   }
+  function queueWrite(a){
+    var raw=JSON.stringify(a.slice(-40)); memQueue=raw; lsSet(QUEUE_KEY,raw);
+  }
+  function queuePush(p){ var a=queueRead(); a.push(p); queueWrite(a); }
+
+  function payload(){
+    var hits=countHits(), lines=countLines();
+    return {
+      ts:new Date().toISOString(),
+      device:deviceId(),
+      mode:S.mode,                       // duo | solo
+      user:S.user,
+      host:S.mode==="solo" ? "" : S.host,
+      cardType:S.type,                   // preset | custom
+      tasks:S.tasks,
+      hits:S.hits.map(function(b){ return b?1:0; }),
+      stamps:hits,
+      lines:lines,
+      redEnvelopes:(lines>=1?1:0)+(lines>=2?1:0)+(hits===9?1:0),
+      food:S.food, drink:S.drink, wish:S.wish,
+      fullHouse:hits===9?1:0,
+      startedAt:S.startedAt,
+      finished:hits===9?1:0
+    };
+  }
+
+  function post(p){
+    // GAS 用 text/plain 送，避開 preflight；讀不到回應也不影響寫入
+    return fetch(GAS_URL,{
+      method:"POST", mode:"cors", redirect:"follow", keepalive:true,
+      headers:{"Content-Type":"text/plain;charset=utf-8"},
+      body:JSON.stringify(p)
+    }).then(function(r){ return r.ok ? "ok" : Promise.reject(new Error("http "+r.status)); })
+      .catch(function(){
+        // 讀不到回應（file:// 或 CORS）時改用 no-cors 盲送
+        return fetch(GAS_URL,{ method:"POST", mode:"no-cors", keepalive:true,
+          headers:{"Content-Type":"text/plain;charset=utf-8"}, body:JSON.stringify(p) })
+          .then(function(){ return "blind"; });
+      });
+  }
+
+  function flushQueue(){
+    if(!GAS_URL) return;
+    var a=queueRead(); if(!a.length) return;
+    var next=a[0];
+    post(next).then(function(){
+      var cur=queueRead(); cur.shift(); queueWrite(cur);
+      if(cur.length) flushQueue(); else { syncState="done"; lastSentAt=hhmm(); render(); }
+    }).catch(function(){ syncState="queued"; render(); });
+  }
+
+  function syncNow(force){
+    if(!GAS_URL){ syncState="off"; render(); return; }
+    if(!S.locked) return;
+    syncState="sending"; render();
+    var p=payload();
+    post(p).then(function(){
+      syncState="done"; lastSentAt=hhmm(); render(); flushQueue();
+    }).catch(function(){
+      queuePush(p); syncState="queued"; render();
+      if(force) toast("後台送不出去，已存待送佇列");
+    });
+  }
+
+  function syncSoon(){
+    if(!GAS_URL){ syncState="off"; return; }
+    syncState="pending"; render();
+    if(syncT) clearTimeout(syncT);
+    syncT=setTimeout(function(){ syncNow(false); }, 1800);
+  }
+
+  function hhmm(){
+    var d=new Date(), p=function(n){ return (n<10?"0":"")+n; };
+    return p(d.getHours())+":"+p(d.getMinutes());
+  }
+
+  window.addEventListener("online", function(){ flushQueue(); });
+
+  // 離開／切走／關閉頁面前，用 sendBeacon 補送最後狀態（不等回應也送得出去）
+  function beacon(){
+    if(!GAS_URL || !S.locked || !S.user) return;
+    if(syncT){ clearTimeout(syncT); syncT=null; }
+    try{
+      var b=new Blob([JSON.stringify(payload())],{type:"text/plain;charset=utf-8"});
+      if(!navigator.sendBeacon(GAS_URL,b)) queuePush(payload());
+    }catch(e){ queuePush(payload()); }
+  }
+  document.addEventListener("visibilitychange", function(){
+    if(document.visibilityState==="hidden") beacon();
+  });
+  window.addEventListener("pagehide", beacon);
 
   /* ============================================================
      小工具
@@ -390,14 +468,10 @@ dialog::backdrop{background:rgba(9,5,7,.72)}
   function $(id){ return document.getElementById(id); }
   function esc(s){ var d=document.createElement("div"); d.textContent=(s==null?"":String(s)); return d.innerHTML; }
   function countHits(){ var n=0; for(var i=0;i<9;i++) if(S.hits[i]) n++; return n; }
-  function countLines(){
-    var n=0;
-    for(var i=0;i<LINES.length;i++){
-      var L=LINES[i];
-      if(S.hits[L[0]]&&S.hits[L[1]]&&S.hits[L[2]]) n++;
-    }
-    return n;
-  }
+  function countLines(){ var n=0; for(var i=0;i<LINES.length;i++){ var L=LINES[i]; if(S.hits[L[0]]&&S.hits[L[1]]&&S.hits[L[2]]) n++; } return n; }
+  function stampsLeft(){ return 9-countHits(); }
+  function presetFor(mode){ return (mode==="solo"?PRESET_SOLO:PRESET_DUO).slice(); }
+
   var toastT=null;
   function toast(msg){
     var el=$("toast"); el.textContent=msg; el.classList.add("show");
@@ -405,65 +479,71 @@ dialog::backdrop{background:rgba(9,5,7,.72)}
     toastT=setTimeout(function(){ el.classList.remove("show"); },2400);
   }
 
-  // dialog：confirm / prompt
   function ask(opt, cb){
     var dlg=$("dlg");
-    $("dlg-t").textContent = opt.title||"確認";
-    $("dlg-p").textContent = opt.body||"";
+    $("dlg-t").textContent=opt.title||"確認";
+    $("dlg-p").textContent=opt.body||"";
     var inp=$("dlg-in");
     if(opt.input){ inp.classList.remove("hide"); inp.value=""; inp.placeholder=opt.placeholder||""; }
     else inp.classList.add("hide");
-    $("dlg-ok").textContent = opt.ok||"確認";
-    function done(){
-      dlg.removeEventListener("close", done);
-      cb(dlg.returnValue==="ok", inp.value);
+    $("dlg-ok").textContent=opt.ok||"確認";
+    function done(){ dlg.removeEventListener("close",done); cb(dlg.returnValue==="ok", inp.value); }
+    if(typeof dlg.showModal==="function"){
+      dlg.addEventListener("close",done); dlg.showModal();
+      if(opt.input) setTimeout(function(){ try{inp.focus();}catch(e){} },50);
+    }else{
+      var okv=window.confirm((opt.title||"")+"\n"+(opt.body||""));
+      var v=(okv&&opt.input)?(window.prompt(opt.placeholder||"")||""):"";
+      cb(okv,v);
     }
-    dlg.addEventListener("close", done);
-    if(typeof dlg.showModal==="function") dlg.showModal();
-    else { // 極舊瀏覽器 fallback
-      var okv = window.confirm((opt.title||"")+"\n"+(opt.body||""));
-      var v = okv && opt.input ? (window.prompt(opt.placeholder||"")||"") : "";
-      cb(okv, v);
-    }
-    if(opt.input) setTimeout(function(){ try{inp.focus();}catch(e){} },50);
   }
 
   /* ============================================================
-     Step 1：組隊 ＋ 選卡
+     Step 1
      ============================================================ */
   function buildCustomInputs(){
     var box=$("custom-inputs"); box.innerHTML="";
     for(var i=0;i<9;i++){
-      var w=document.createElement("div");
-      w.style.marginBottom="7px";
-      w.innerHTML='<input class="inp ct" data-i="'+i+'" type="text" maxlength="24" placeholder="第 '+(i+1)+' 格任務" />';
+      var w=document.createElement("div"); w.style.marginBottom="7px";
+      w.innerHTML='<input class="inp ct" data-i="'+i+'" type="text" maxlength="26" placeholder="第 '+(i+1)+' 格任務" />';
       box.appendChild(w);
     }
-    var ins=box.querySelectorAll(".ct");
-    for(var j=0;j<ins.length;j++){
-      if(S.type==="custom" && S.tasks[j]) ins[j].value=S.tasks[j];
+    if(S.type==="custom"){
+      var ins=box.querySelectorAll(".ct");
+      for(var j=0;j<ins.length;j++) if(S.tasks[j]) ins[j].value=S.tasks[j];
     }
   }
-
-  function syncTypeUI(){
-    var custom = S.type==="custom";
-    $("custom-box").classList.toggle("hide", !custom);
-    $("opt-preset").classList.toggle("sel", !custom);
-    $("opt-custom").classList.toggle("sel", custom);
+  function syncSetupUI(){
+    var custom=S.type==="custom", solo=S.mode==="solo";
+    $("custom-box").classList.toggle("hide",!custom);
+    $("opt-preset").classList.toggle("sel",!custom);
+    $("opt-custom").classList.toggle("sel",custom);
+    $("opt-duo").classList.toggle("sel",!solo);
+    $("opt-solo").classList.toggle("sel",solo);
+    $("host-wrap").classList.toggle("hide",solo);
   }
 
-  var radios=document.querySelectorAll('input[name="ctype"]');
-  for(var r=0;r<radios.length;r++){
-    radios[r].addEventListener("change", function(){
+  var modeRadios=document.querySelectorAll('input[name="mode"]');
+  for(var mi=0;mi<modeRadios.length;mi++){
+    modeRadios[mi].addEventListener("change", function(){
+      S.mode = this.value==="solo" ? "solo" : "duo";
+      if(S.type==="preset") S.tasks=presetFor(S.mode);
+      syncSetupUI(); save();
+    });
+  }
+  var typeRadios=document.querySelectorAll('input[name="ctype"]');
+  for(var ti=0;ti<typeRadios.length;ti++){
+    typeRadios[ti].addEventListener("change", function(){
       S.type = this.value==="custom" ? "custom" : "preset";
-      if(S.type==="preset") S.tasks = PRESET.slice();
-      syncTypeUI(); save();
+      if(S.type==="preset") S.tasks=presetFor(S.mode);
+      syncSetupUI(); save();
     });
   }
 
   $("btn-lock").addEventListener("click", function(){
     var u=$("in-user").value.trim(), h=$("in-host").value.trim();
-    if(!u || !h){ toast("請先填用戶帳號與組隊主播"); return; }
+    if(!u){ toast("請先填用戶帳號"); return; }
+    if(S.mode==="duo" && !h){ toast("1v1 組隊需要填組隊主播"); return; }
 
     var tasks;
     if(S.type==="custom"){
@@ -472,47 +552,41 @@ dialog::backdrop{background:rgba(9,5,7,.72)}
       for(var k=0;k<9;k++) if(!tasks[k]){ toast("自建卡要填滿 9 格（第 "+(k+1)+" 格未填）"); return; }
       var seen={};
       for(var m=0;m<9;m++){
-        var key=tasks[m];
-        if(seen[key]){ toast("任務不可重複：「"+key+"」"); return; }
-        seen[key]=1;
+        if(seen[tasks[m]]){ toast("任務不可重複：「"+tasks[m]+"」"); return; }
+        seen[tasks[m]]=1;
       }
     }else{
-      tasks=PRESET.slice();
+      tasks=presetFor(S.mode);
     }
 
-    S.user=u; S.host=h; S.tasks=tasks; S.locked=true;
-    save(); render();
-    toast("卡片已鎖定，開始蓋章！");
+    S.user=u; S.host=(S.mode==="solo"?"":h); S.tasks=tasks; S.locked=true;
+    S.startedAt=new Date().toISOString(); S.device=deviceId();
+    save(); render(); syncNow(false);
+    toast(S.mode==="solo" ? "單人闖關開始！" : "卡片已鎖定，開始蓋章！");
   });
 
   /* ============================================================
-     Step 2：蓋章 ＋ 連線
+     Step 2：蓋章
      ============================================================ */
-  function stampsLeft(){ return 9-countHits(); }
-
   function doStamp(i){
     if(S.hits[i]) return;
-    // 最後一格（第 9 個章）需工作人員現場碼
     if(stampsLeft()===1){
-      ask({
-        title:"第 9 格核銷",
-        body:"這是最後一格，需工作人員輸入現場碼登記全連。",
-        input:true, placeholder:"現場碼", ok:"核銷"
-      }, function(ok, val){
+      ask({title:"第 9 格核銷", body:"這是最後一格，需工作人員輸入現場碼登記全連。",
+           input:true, placeholder:"現場碼", ok:"核銷"}, function(ok,val){
         if(!ok) return;
         if(String(val).trim()!==STAFF_CODE){ toast("現場碼不正確"); return; }
-        S.hits[i]=true; S.firstAll=true; save(); render();
+        S.hits[i]=true; S.firstAll=true; save(); render(); syncNow(true);
         toast("全連完成！請登記第一名與 5,000 點餐額度");
       });
       return;
     }
     var before=countLines();
-    S.hits[i]=true; save(); render();
+    S.hits[i]=true; save(); render(); syncSoon();
     var after=countLines();
     if(after>before){
       if(after===1) toast("連 1 線！可選 1 份主食 ＋ 抽紅包 ×1");
       else if(after===2) toast("連 2 線！可選 1 樣飲品 ＋ 抽紅包 ×1");
-      else toast("再多一條線！目前 "+after+" 線");
+      else toast("目前 "+after+" 線");
     }
   }
 
@@ -520,9 +594,8 @@ dialog::backdrop{background:rgba(9,5,7,.72)}
     if(!S.hits[i]) return;
     ask({title:"取消這一格？", body:"「"+S.tasks[i]+"」的蓋章會被移除。", ok:"取消蓋章"}, function(ok){
       if(!ok) return;
-      S.hits[i]=false;
-      if(countHits()<9) S.firstAll=false;
-      save(); render(); toast("已取消該格蓋章");
+      S.hits[i]=false; if(countHits()<9) S.firstAll=false;
+      save(); render(); syncSoon(); toast("已取消該格蓋章");
     });
   }
 
@@ -531,13 +604,12 @@ dialog::backdrop{background:rgba(9,5,7,.72)}
     for(var i=0;i<9;i++){
       var d=document.createElement("div");
       d.className="cell"+(S.hits[i]?" hit":"")+(!S.hits[i]&&stampsLeft()===1?" final":"");
-      d.setAttribute("data-i", i);
+      d.setAttribute("data-i",i);
       d.innerHTML='<span class="no">'+(i+1)+'</span><span class="tx">'+esc(S.tasks[i])+'</span>';
       g.appendChild(d);
     }
   }
 
-  // 點擊＝蓋章；長按（600ms）＝取消
   var pressT=null, pressed=-1, longFired=false;
   function bindGrid(){
     var g=$("grid");
@@ -560,7 +632,7 @@ dialog::backdrop{background:rgba(9,5,7,.72)}
   }
 
   /* ============================================================
-     餐飲選單
+     餐飲
      ============================================================ */
   function buildMenu(id, arr, group, val, enabled){
     var box=$(id); box.innerHTML="";
@@ -568,27 +640,69 @@ dialog::backdrop{background:rgba(9,5,7,.72)}
       var lab=document.createElement("label");
       lab.className="opt"+(val===arr[i]?" sel":"");
       lab.innerHTML='<input type="radio" name="'+group+'" value="'+esc(arr[i])+'"'+
-                    (val===arr[i]?" checked":"")+(enabled?"":" disabled")+' /><span>'+esc(arr[i])+'</span>';
+        (val===arr[i]?" checked":"")+(enabled?"":" disabled")+' /><span>'+esc(arr[i])+'</span>';
       box.appendChild(lab);
     }
-    box.classList.toggle("locked-menu", !enabled);
+    box.classList.toggle("locked-menu",!enabled);
   }
-
   function bindMenus(){
     document.addEventListener("change", function(e){
-      var t=e.target;
-      if(t && t.name==="food"){ S.food=t.value; save(); render(); toast("主食已登記："+t.value); }
-      if(t && t.name==="drink"){ S.drink=t.value; save(); render(); toast("飲品已登記："+t.value); }
+      var t=e.target; if(!t) return;
+      if(t.name==="food"){ S.food=t.value; save(); render(); syncSoon(); toast("主食已登記："+t.value); }
+      if(t.name==="drink"){ S.drink=t.value; save(); render(); syncSoon(); toast("飲品已登記："+t.value); }
     });
-    $("in-wish").addEventListener("input", function(){ S.wish=this.value; save(); });
+    $("in-wish").addEventListener("input", function(){ S.wish=this.value; save(); syncSoon(); });
   }
 
   /* ============================================================
      工作人員
      ============================================================ */
+  $("btn-sync").addEventListener("click", function(){
+    if(!GAS_URL){ toast("尚未填入 GAS_URL，目前只存本機"); return; }
+    syncNow(true); flushQueue();
+  });
+
+  // 換裝置／清掉快取後，用帳號把進度從後台拉回來
+  function restoreFromServer(user, cb){
+    var url=GAS_URL+(GAS_URL.indexOf("?")>-1?"&":"?")+"action=get&user="+encodeURIComponent(user);
+    fetch(url,{method:"GET",redirect:"follow"})
+      .then(function(r){ return r.json(); })
+      .then(function(o){
+        if(!o || !o.found){ cb(false,"後台查不到這個帳號的紀錄"); return; }
+        var d=o.data||{};
+        S.mode = (d.mode==="solo")?"solo":"duo";
+        S.user = d.user||user;
+        S.host = d.host||"";
+        S.type = (d.cardType==="custom")?"custom":"preset";
+        if(Array.isArray(d.tasks)&&d.tasks.length===9) S.tasks=d.tasks.map(String);
+        else S.tasks=presetFor(S.mode);
+        if(Array.isArray(d.hits)&&d.hits.length===9) S.hits=d.hits.map(function(v){ return !!Number(v); });
+        S.food=d.food||""; S.drink=d.drink||""; S.wish=d.wish||"";
+        S.startedAt=d.startedAt||""; S.locked=true;
+        S.firstAll=countHits()===9;
+        save(); render();
+        cb(true,"已從後台還原："+S.user);
+      })
+      .catch(function(){ cb(false,"連不到後台，請檢查 GAS 部署權限（需「任何人」可存取）"); });
+  }
+
+  function onRestoreClick(){
+    if(!GAS_URL){ toast("尚未填入 GAS_URL"); return; }
+    ask({title:"從後台還原進度", body:"用戶不小心關掉網頁、或換了一台裝置時使用。輸入用戶帳號，會把後台最新一筆拉回這台裝置。",
+         input:true, placeholder:"用戶帳號", ok:"還原"}, function(ok,val){
+      if(!ok) return;
+      var u=String(val).trim();
+      if(!u){ toast("請輸入用戶帳號"); return; }
+      toast("查詢中…");
+      restoreFromServer(u, function(good,msg){ toast(msg); });
+    });
+  }
+  $("btn-restore").addEventListener("click", onRestoreClick);
+  $("btn-restore-2").addEventListener("click", onRestoreClick);
+
   $("btn-unlock").addEventListener("click", function(){
-    ask({title:"解鎖卡片？", body:"解鎖後可修改組隊與任務內容，已蓋的章會保留。", input:true, placeholder:"現場碼", ok:"解鎖"},
-    function(ok,val){
+    ask({title:"解鎖卡片？", body:"解鎖後可修改報到資料與任務，已蓋的章會保留。",
+         input:true, placeholder:"現場碼", ok:"解鎖"}, function(ok,val){
       if(!ok) return;
       if(String(val).trim()!==STAFF_CODE){ toast("現場碼不正確"); return; }
       S.locked=false; save(); render(); toast("已解鎖，可修改卡片");
@@ -596,37 +710,39 @@ dialog::backdrop{background:rgba(9,5,7,.72)}
   });
 
   $("btn-reset").addEventListener("click", function(){
-    ask({title:"換下一位？", body:"這台裝置的進度會全部清除，無法復原。請先確認已登記結算。", input:true, placeholder:"現場碼", ok:"清除"},
-    function(ok,val){
+    ask({title:"換下一位？", body:"這台裝置的進度會全部清除，無法復原。清除前會先送一次後台。",
+         input:true, placeholder:"現場碼", ok:"清除"}, function(ok,val){
       if(!ok) return;
       if(String(val).trim()!==STAFF_CODE){ toast("現場碼不正確"); return; }
-      clearStore();
-      S={user:"",host:"",type:"preset",tasks:PRESET.slice(),
+      if(GAS_URL && S.locked && S.user){ try{ post(payload()); }catch(e){} }
+      lsDel(STORE_KEY); memStore=null;
+      S={mode:"duo",user:"",host:"",type:"preset",tasks:PRESET_DUO.slice(),
          hits:[false,false,false,false,false,false,false,false,false],
-         locked:false,food:"",drink:"",wish:"",firstAll:false};
+         locked:false,food:"",drink:"",wish:"",firstAll:false,startedAt:"",device:deviceId()};
       save(); render(); toast("已清除，可交給下一位");
     });
   });
 
   $("btn-summary").addEventListener("click", function(){
-    var lines=countLines(), hits=countHits();
+    var hits=countHits(), lines=countLines();
     var red=(lines>=1?1:0)+(lines>=2?1:0)+(hits===9?1:0);
+    var q=queueRead().length;
     var txt=
       "【女神點唱 BINGO 結算】8/29 oncor\n"+
-      "用戶："+S.user+"　主播："+S.host+"\n"+
+      "形式："+(S.mode==="solo"?"單人闖關":"1v1 組隊")+"\n"+
+      "用戶："+S.user+(S.mode==="solo"?"":"　主播："+S.host)+"\n"+
       "卡片："+(S.type==="custom"?"自建卡":"預設卡")+"\n"+
       "蓋章："+hits+"/9　連線："+lines+" 線\n"+
       "主食："+(S.food||"—")+"\n"+
       "飲品："+(S.drink||"—")+"\n"+
       "可抽紅包："+red+" 次\n"+
-      "全連："+(hits===9?"是（需登記是否為第一名／5,000 點餐額度）":"否")+"\n"+
-      "許願："+(S.wish||"—");
+      "全連："+(hits===9?"是（需登記是否第一名／5,000 點餐額度）":"否")+"\n"+
+      "許願："+(S.wish||"—")+"\n"+
+      "裝置："+deviceId()+"　待送佇列："+q+" 筆";
     ask({title:"結算摘要", body:txt, ok:"複製"}, function(ok){
       if(!ok) return;
-      try{
-        navigator.clipboard.writeText(txt);
-        toast("已複製，可貼到核銷名單");
-      }catch(e){ toast("複製失敗，請手動抄寫"); }
+      try{ navigator.clipboard.writeText(txt); toast("已複製，可貼到核銷名單"); }
+      catch(e){ toast("複製失敗，請手動抄寫"); }
     });
   });
 
@@ -640,21 +756,31 @@ dialog::backdrop{background:rgba(9,5,7,.72)}
   function render(){
     var hits=countHits(), lines=countLines();
     var red=(lines>=1?1:0)+(lines>=2?1:0)+(hits===9?1:0);
+    var solo=S.mode==="solo";
 
-    // step 切換
-    $("setup").classList.toggle("hide", S.locked);
-    $("game").classList.toggle("hide", !S.locked);
-    $("sticky").classList.toggle("hide", !S.locked);
+    $("setup").classList.toggle("hide",S.locked);
+    $("game").classList.toggle("hide",!S.locked);
+    $("sticky").classList.toggle("hide",!S.locked);
 
     if(!S.locked){
       $("in-user").value=S.user; $("in-host").value=S.host;
-      syncTypeUI();
-      return;
+      syncSetupUI(); return;
     }
 
     $("chip-user").textContent="用戶 "+S.user;
-    $("chip-host").textContent="主播 "+S.host;
-    $("chip-type").textContent=(S.type==="custom"?"自建卡":"預設卡");
+    $("chip-host").classList.toggle("hide",solo);
+    $("chip-x").classList.toggle("hide",solo);
+    if(!solo) $("chip-host").textContent="主播 "+S.host;
+    $("chip-type").textContent=(solo?"單人闖關・":"1v1・")+(S.type==="custom"?"自建卡":"預設卡");
+
+    var sc=$("chip-sync"); sc.className="chip sync";
+    var q=queueRead().length;
+    if(!GAS_URL){ sc.textContent="未接後台"; sc.classList.add("warn"); }
+    else if(syncState==="sending"){ sc.textContent="同步中…"; }
+    else if(syncState==="pending"){ sc.textContent="待同步"; sc.classList.add("warn"); }
+    else if(syncState==="queued"){ sc.textContent="待送 "+q+" 筆"; sc.classList.add("err"); }
+    else if(syncState==="done"){ sc.textContent="已同步 "+lastSentAt; }
+    else { sc.textContent="已接後台"; }
 
     $("s-cell").innerHTML=hits+'<span style="font-size:13px;color:var(--on-dark-3)">/9</span>';
     $("s-line").textContent=lines;
@@ -663,15 +789,15 @@ dialog::backdrop{background:rgba(9,5,7,.72)}
 
     buildGrid();
 
-    $("t1").classList.toggle("on", lines>=1);
-    $("t2").classList.toggle("on", lines>=2);
-    $("t3").classList.toggle("on", hits===9);
-    $("t1-st").textContent = lines>=1 ? (S.food? "已選："+S.food : "已達成・待選主食") : "尚未達成";
-    $("t2-st").textContent = lines>=2 ? (S.drink? "已選："+S.drink : "已達成・待選飲品") : "尚未達成";
+    $("t1").classList.toggle("on",lines>=1);
+    $("t2").classList.toggle("on",lines>=2);
+    $("t3").classList.toggle("on",hits===9);
+    $("t1-st").textContent = lines>=1 ? (S.food?"已選："+S.food:"已達成・待選主食") : "尚未達成";
+    $("t2-st").textContent = lines>=2 ? (S.drink?"已選："+S.drink:"已達成・待選飲品") : "尚未達成";
     $("t3-st").textContent = hits===9 ? "已全連・請工作人員登記第一名與 5,000 點餐額度" : "尚未達成";
 
-    buildMenu("food-opts", FOOD, "food", S.food, lines>=1);
-    buildMenu("drink-opts", DRINK, "drink", S.drink, lines>=2);
+    buildMenu("food-opts",FOOD,"food",S.food,lines>=1);
+    buildMenu("drink-opts",DRINK,"drink",S.drink,lines>=2);
     $("food-note").textContent  = lines>=1 ? "已開放。選好後由主播／工作人員向櫃檯下單。" : "連 1 線後開放選擇。";
     $("drink-note").textContent = lines>=2 ? "已開放。選好後由主播／工作人員向櫃檯下單。" : "連 2 線後開放選擇。";
     $("in-wish").value=S.wish;
@@ -681,16 +807,16 @@ dialog::backdrop{background:rgba(9,5,7,.72)}
      init
      ============================================================ */
   load();
+  S.device=deviceId();
+  if(S.type==="preset") S.tasks=presetFor(S.mode);
   buildCustomInputs();
   bindGrid();
   bindMenus();
   render();
+  if(GAS_URL) flushQueue();
 
-  // 對外暴露，方便自測
-  window.__bingo = {
-    state:function(){ return S; },
-    lines:countLines, hits:countHits, LINES:LINES
-  };
+  window.__bingo={ state:function(){return S;}, lines:countLines, hits:countHits,
+                   payload:payload, queue:queueRead, LINES:LINES };
 })();
 </script>
 </body>

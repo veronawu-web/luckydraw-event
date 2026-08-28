@@ -518,7 +518,7 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:rgba(2
   var STAFF_SESSION_SEC = 0;
 
   // Google Apps Script 部署網址（/exec 結尾）。留空＝只存本機、不回傳。
-  var GAS_URL = "";
+  var GAS_URL = "https://script.google.com/macros/s/AKfycbzbRqxAR6ehgiP_Mx-7tB1EEjSP6vWBRbuYu_Qm_81UmgRhmUCxlZ-djK-fOd7fqc7URw/exec";
 
   // 這台裝置的代號（多台平板時方便對帳，可留空自動產生）
   var DEVICE_ID = "";
@@ -582,12 +582,13 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:rgba(2
   var LINE_URL   = "";                       // 活動 LINE@ 加入連結
   var LINE_TITLE = "加入活動 LINE@ 送 2,000 鑽石";
   var LINE_NOTE  = "掃描 QR code 加入，出示加入畫面給工作人員即可領取";
-  var SITE_URL   = "";                       // 站內其他活動連結
-  var SITE_TITLE = "站內還有其他活動進行中";
-  var SITE_NOTE  = "點開看看目前開放的活動與獎勵";
+  var SITE_URL   = "https://swag.live/iframe/?source=https://events.swag.app/vip_referral&title=";                       // 站內其他活動連結
+  var SITE_TITLE = "VIP 尊榮推薦大使活動";
+  var SITE_NOTE  = "推薦好友一起玩，累積積分換獎勵";
 
   var LINES = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
   var STORE_KEY = "swag_bingo_0829_v2";
+  var SIG_KEY   = "swag_bingo_0829_sig";
   var QUEUE_KEY = "swag_bingo_0829_queue";
   var DEV_KEY   = "swag_bingo_0829_device";
 
@@ -639,7 +640,15 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:rgba(2
      GAS 同步：debounce ＋ 離線佇列
      ============================================================ */
   var syncState="idle";   // idle | pending | sending | done | queued | off
-  var syncT=null, lastSentAt="";
+  var syncT=null, lastSentAt="", lastSig="";
+  function setSig(v){ lastSig=v; lsSet(SIG_KEY,v||""); }
+
+  // 狀態簽章（不含時間戳）：一樣就不用再送，後台才不會多出重複列
+  function sigOf(p){
+    return [p.mode,p.user,p.host,p.cardType,p.stamps,p.lines,
+            p.food,p.drink,p.wish,p.fullHouse,p.mealsUnlocked,
+            (p.tasks||[]).join("|"),(p.hits||[]).join("")].join("\u0001");
+  }
 
   function queueRead(){
     var raw=lsGet(QUEUE_KEY)||memQueue;
@@ -694,6 +703,7 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:rgba(2
     var next=a[0];
     post(next).then(function(){
       var cur=queueRead(); cur.shift(); queueWrite(cur);
+      setSig(sigOf(next));
       if(cur.length) flushQueue(); else { syncState="done"; lastSentAt=hhmm(); render(); }
     }).catch(function(){ syncState="queued"; render(); });
   }
@@ -701,10 +711,11 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:rgba(2
   function syncNow(force){
     if(!GAS_URL){ syncState="off"; render(); return; }
     if(!S.locked) return;
+    var p=payload(), sg=sigOf(p);
+    if(!force && sg===lastSig){ syncState="done"; render(); return; }  // 沒變就不送
     syncState="sending"; render();
-    var p=payload();
     post(p).then(function(){
-      syncState="done"; lastSentAt=hhmm(); render(); flushQueue();
+      setSig(sg); syncState="done"; lastSentAt=hhmm(); render(); flushQueue();
     }).catch(function(){
       queuePush(p); syncState="queued"; render();
       if(force) toast("後台送不出去，已存待送佇列");
@@ -713,9 +724,10 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:rgba(2
 
   function syncSoon(){
     if(!GAS_URL){ syncState="off"; return; }
+    if(S.locked && sigOf(payload())===lastSig) return;   // 沒變就不排程
     syncState="pending"; render();
     if(syncT) clearTimeout(syncT);
-    syncT=setTimeout(function(){ syncNow(false); }, 1800);
+    syncT=setTimeout(function(){ syncNow(false); }, 3000);
   }
 
   function hhmm(){
@@ -728,11 +740,13 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:rgba(2
   // 離開／切走／關閉頁面前，用 sendBeacon 補送最後狀態（不等回應也送得出去）
   function beacon(){
     if(!GAS_URL || !S.locked || !S.user) return;
+    var p=payload(), sg=sigOf(p);
+    if(sg===lastSig) return;                    // 這個狀態已經送過了，不再補送
     if(syncT){ clearTimeout(syncT); syncT=null; }
     try{
-      var b=new Blob([JSON.stringify(payload())],{type:"text/plain;charset=utf-8"});
-      if(!navigator.sendBeacon(GAS_URL,b)) queuePush(payload());
-    }catch(e){ queuePush(payload()); }
+      var b=new Blob([JSON.stringify(p)],{type:"text/plain;charset=utf-8"});
+      if(navigator.sendBeacon(GAS_URL,b)) setSig(sg); else queuePush(p);
+    }catch(e){ queuePush(p); }
   }
   document.addEventListener("visibilitychange", function(){
     if(document.visibilityState==="hidden") beacon();
@@ -1095,8 +1109,12 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:rgba(2
          input:true, placeholder:"現場碼", ok:"清除"}, function(ok,val){
       if(!ok) return;
       if(String(val).trim()!==STAFF_CODE){ toast("現場碼不正確"); return; }
-      if(GAS_URL && S.locked && S.user){ try{ post(payload()); }catch(e){} }
-      lsDel(STORE_KEY); memStore=null;
+      if(GAS_URL && S.locked && S.user){
+        var pf=payload();
+        if(sigOf(pf)!==lastSig){ try{ post(pf); }catch(e){} }
+      }
+      setSig("");
+      lsDel(STORE_KEY); lsDel(SIG_KEY); memStore=null;
       picked=[];
       S={mode:"duo",user:"",host:"",type:"preset",tasks:BANK_DUO.slice(0,9),
          hits:[false,false,false,false,false,false,false,false,false],
@@ -1245,6 +1263,7 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:rgba(2
      init
      ============================================================ */
   load();
+  lastSig = lsGet(SIG_KEY) || "";
   S.device=deviceId();
   if(S.type==="preset") S.tasks=presetFor(S.mode);
   bindPickList();

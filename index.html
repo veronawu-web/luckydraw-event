@@ -341,6 +341,7 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:rgba(2
         <button class="btn ghost mini" id="btn-sync">立即同步後台</button>
         <button class="btn ghost mini" id="btn-restore">從後台還原</button>
         <button class="btn ghost mini" id="btn-summary">結算摘要</button>
+        <button class="btn ghost mini" id="btn-export">匯出本機全部</button>
         <button class="btn ghost mini" id="btn-unlock">解鎖卡片</button>
         <button class="btn ghost mini" id="btn-reset">換下一位（清除本機）</button>
         <button class="btn ghost mini" id="btn-staff-close">關閉此面板</button>
@@ -593,7 +594,7 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:rgba(2
   var STAFF_SESSION_SEC = 0;
 
   // Google Apps Script 部署網址（/exec 結尾）。留空＝只存本機、不回傳。
-  var GAS_URL = "https://script.google.com/macros/s/AKfycbzbRqxAR6ehgiP_Mx-7tB1EEjSP6vWBRbuYu_Qm_81UmgRhmUCxlZ-djK-fOd7fqc7URw/exec";
+  var GAS_URL = "https://script.google.com/macros/s/AKfycbz8ePFhJ7lz-HwSbLfkWX1klHVTQDUKiZ_O4illH8v0kqOtcF71VHK3jMlSNLlrSQ711w/exec";
 
   // 這台裝置的代號（多台平板時方便對帳，可留空自動產生）
   var DEVICE_ID = "";
@@ -667,6 +668,7 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:rgba(2
   var LINES = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
   var STORE_KEY = "swag_bingo_0829_v2";
   var SIG_KEY   = "swag_bingo_0829_sig";
+  var HIST_KEY  = "swag_bingo_0829_hist";   // 這台裝置服務過的所有用戶（不會被「換下一位」清掉）
   var QUEUE_KEY = "swag_bingo_0829_queue";
   var DEV_KEY   = "swag_bingo_0829_device";
 
@@ -698,7 +700,27 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:rgba(2
     return d;
   }
 
-  function save(){ var raw=JSON.stringify(S); memStore=raw; lsSet(STORE_KEY,raw); }
+  function save(){
+    var raw=JSON.stringify(S); memStore=raw; lsSet(STORE_KEY,raw);
+    histUpsert();
+  }
+
+  // ── 本機歷史：離線也留得住，換下一位不會清掉
+  var memHist=null;
+  function histRead(){
+    var raw=lsGet(HIST_KEY)||memHist;
+    if(!raw) return [];
+    try{ var a=JSON.parse(raw); return Array.isArray(a)?a:[]; }catch(e){ return []; }
+  }
+  function histWrite(a){ var raw=JSON.stringify(a); memHist=raw; lsSet(HIST_KEY,raw); }
+  function histUpsert(){
+    if(!S.locked || !S.user) return;
+    var rec=payload(); rec.savedAt=new Date().toISOString();
+    var a=histRead(), hit=-1;
+    for(var i=0;i<a.length;i++) if(a[i].user===rec.user && a[i].mode===rec.mode){ hit=i; break; }
+    if(hit>-1) a[hit]=rec; else a.push(rec);
+    histWrite(a);
+  }
   function load(){
     var raw=lsGet(STORE_KEY)||memStore; if(!raw) return;
     try{
@@ -1157,6 +1179,10 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:rgba(2
   function setStaffPanel(v){
     staffPanel=!!v;
     $("staff-card").classList.toggle("hide", !staffPanel);
+    if(staffPanel){
+      var hn=histRead().length;
+      $("btn-export").textContent = "匯出本機全部（"+hn+" 筆）";
+    }
   }
   (function bindStaffGate(){
     var t=null;
@@ -1322,6 +1348,7 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:rgba(2
         if(sigOf(pf)!==lastSig){ try{ post(pf); }catch(e){} }
       }
       setSig("");
+      histUpsert();                 // 清除前先把這位存進歷史
       lsDel(STORE_KEY); lsDel(SIG_KEY); memStore=null;
       picked=[];
       S={mode:"duo",user:"",host:"",type:"preset",tasks:BANK_DUO.slice(0,9),
@@ -1356,8 +1383,78 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:rgba(2
       "裝置："+deviceId()+"　待送佇列："+q+" 筆";
     ask({title:"結算摘要", body:txt, ok:"複製"}, function(ok){
       if(!ok) return;
-      try{ navigator.clipboard.writeText(txt); toast("已複製，可貼到核銷名單"); }
-      catch(e){ toast("複製失敗，請手動抄寫"); }
+      try{
+        var pr2=navigator.clipboard.writeText(txt);
+        if(pr2&&pr2.then) pr2.then(function(){ toast("已複製，可貼到核銷名單"); })
+                             .catch(function(){ toast("複製失敗，請手動抄寫"); });
+      }catch(e){ toast("複製失敗，請手動抄寫"); }
+    });
+  });
+
+  // ── 匯出本機全部紀錄（不需要網路、不需要 GAS）
+  var HIST_COLS=[
+    ["savedAt","更新時間"],["mode","形式"],["user","用戶"],["host","主播"],["cardType","卡片"],
+    ["stamps","蓋章數"],["lines","連線數"],["redEnvelopes","可抽紅包次數"],
+    ["food","主食"],["foodDone","主食核銷"],["drink","飲品"],["drinkDone","飲品核銷"],
+    ["red1","紅包1"],["red2","紅包2"],["red3","紅包3"],["redTotal","紅包合計"],
+    ["fullHouse","全連"],["mealsUnlocked","解鎖餐點"],["wish","許願"],["device","裝置"],["tasks","任務內容"]
+  ];
+  function histRows(){
+    var a=histRead(), rows=[HIST_COLS.map(function(c){ return c[1]; })];
+    for(var i=0;i<a.length;i++){
+      var r=a[i];
+      rows.push(HIST_COLS.map(function(c){
+        var v=r[c[0]];
+        if(c[0]==="mode") return v==="solo"?"單人闖關":"1v1 組隊";
+        if(c[0]==="cardType") return v==="pick"?"自選卡":"預設卡";
+        if(c[0]==="tasks") return (v||[]).join(" | ");
+        if(c[0]==="fullHouse") return Number(v)?"Y":"";
+        return v==null?"":String(v);
+      }));
+    }
+    return rows;
+  }
+  function toCSV(rows){
+    return rows.map(function(r){
+      return r.map(function(c){
+        c=String(c==null?"":c);
+        return /[",\n\r]/.test(c) ? '"'+c.replace(/"/g,'""')+'"' : c;
+      }).join(",");
+    }).join("\r\n");
+  }
+  function toTSV(rows){
+    return rows.map(function(r){
+      return r.map(function(c){ return String(c==null?"":c).replace(/[\t\n\r]/g," "); }).join("\t");
+    }).join("\n");
+  }
+
+  $("btn-export").addEventListener("click", function(){
+    var a=histRead();
+    if(!a.length){ toast("這台裝置還沒有任何紀錄"); return; }
+    var rows=histRows();
+    ask({
+      title:"匯出本機全部紀錄",
+      body:"這台裝置累積 "+a.length+" 位用戶的紀錄（不受「換下一位」影響）。\n\n" +
+           "「下載 CSV」存成檔案；「取消」旁邊按不到的話，也可以按確認後直接貼進試算表。",
+      ok:"下載 CSV"
+    }, function(ok){
+      if(ok){
+        try{
+          var blob=new Blob(["\ufeff"+toCSV(rows)],{type:"text/csv;charset=utf-8"});
+          var url=URL.createObjectURL(blob);
+          var link=document.createElement("a");
+          link.href=url; link.download="bingo_0829_"+deviceId()+".csv";
+          document.body.appendChild(link); link.click();
+          setTimeout(function(){ document.body.removeChild(link); URL.revokeObjectURL(url); },500);
+          toast("已下載 "+a.length+" 筆");
+        }catch(e){ toast("下載失敗，改用複製"); }
+      }
+      // 不論下載成不成功，都把 TSV 放進剪貼簿，可直接貼 Google Sheet
+      try{
+        var pr=navigator.clipboard.writeText(toTSV(rows));
+        if(pr&&pr.then) pr.then(function(){ toast("已複製 "+a.length+" 筆，可直接貼進試算表"); })
+                          .catch(function(){ /* 沒有剪貼簿權限就算了，CSV 已下載 */ });
+      }catch(e){}
     });
   });
 
@@ -1417,6 +1514,10 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:rgba(2
     $("game").classList.toggle("hide",!S.locked);
     $("sticky").classList.toggle("hide",!S.locked);
     $("staff-card").classList.toggle("hide", !staffPanel);
+    if(staffPanel){
+      var hn=histRead().length;
+      $("btn-export").textContent = "匯出本機全部（"+hn+" 筆）";
+    }
 
     if(!S.locked){
       $("in-user").value=S.user; $("in-host").value=S.host;

@@ -111,6 +111,23 @@ h1{font-family:var(--cjk);font-weight:600;font-size:26px;letter-spacing:.06em;ma
 .card .opt{background:rgba(13,9,11,.4);border-color:rgba(247,232,230,.18);color:var(--on-dark)}
 .card .opt.sel{border-color:var(--hot);background:rgba(230,61,136,.14)}
 
+.ops-row{padding:10px 0;border-bottom:1px dashed rgba(247,232,230,.14)}
+.ops-row:last-of-type{border-bottom:0}
+.ops-line{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.ops-line+.ops-line{margin-top:7px}
+.ops-name{flex:1 1 100%;font-size:13px}
+.ops-tag{font-family:var(--cond);font-size:11px;letter-spacing:.06em;color:var(--on-dark-3);flex:0 0 auto}
+.ops-inp{flex:1 1 90px;min-width:80px;padding:8px 10px;font-size:15px;text-align:right}
+.ops-unit{font-size:12px;color:var(--on-dark-3);flex:0 0 auto}
+.ops-money.saved .ops-inp{border-color:rgba(79,183,131,.55)}
+.money-badge{display:flex;align-items:baseline;justify-content:space-between;gap:8px;
+  margin:10px 0 0;padding:10px 12px;border-radius:10px;
+  background:linear-gradient(180deg,rgba(233,180,76,.16),rgba(233,180,76,.07));
+  border:1px solid rgba(233,180,76,.42)}
+.money-badge .k{font-family:var(--cjk);font-size:12.5px;font-weight:600;color:#8a5a12}
+.money-badge .v{font-family:var(--cond);font-size:20px;font-weight:600;color:#8a5a12;letter-spacing:.02em}
+.money-badge .b{font-size:11px;color:#a8783a}
+
 .toast{position:fixed;left:50%;bottom:96px;transform:translateX(-50%) translateY(12px);
   background:rgba(13,9,11,.94);border:1px solid rgba(247,232,230,.2);color:var(--on-dark);
   padding:11px 16px;border-radius:999px;font-size:13px;z-index:60;opacity:0;pointer-events:none;
@@ -208,6 +225,10 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:rgba(2
     <div class="card paper">
       <div class="sec-t"><h2>任務卡</h2><span class="lat">tap to stamp</span></div>
       <div class="grid" id="grid"></div>
+      <div class="money-badge hide" id="card-money">
+        <span class="k">累積紅包獎金</span>
+        <span><span class="v" id="card-money-v">0</span> <span class="b" id="card-money-u"></span></span>
+      </div>
       <p class="locked-note"><b>每一格都要工作人員核銷</b>：點格子後輸入現場碼才會蓋章。誤按可長按格子取消（同樣需要現場碼）。</p>
     </div>
 
@@ -271,34 +292,49 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:rgba(2
     <div class="card hide" id="staff-card">
       <div class="sec-t"><h2>工作人員</h2><span class="lat">staff only</span></div>
       <div id="staff-ops" style="margin:0 0 14px;padding-bottom:12px;border-bottom:1px dashed rgba(247,232,230,.18)">
-        <span class="lbl">餐點核銷</span>
-        <div class="team" style="gap:6px;margin-bottom:8px">
-          <span style="flex:1 1 100%;font-size:13px" id="ops-food-t">主食：—</span>
-          <button class="btn ghost mini" id="btn-food-done">核銷出餐</button>
-          <button class="btn ghost mini" id="btn-food-redo">解鎖重選</button>
-        </div>
-        <div class="team" style="gap:6px">
-          <span style="flex:1 1 100%;font-size:13px" id="ops-drink-t">飲品：—</span>
-          <button class="btn ghost mini" id="btn-drink-done">核銷出餐</button>
-          <button class="btn ghost mini" id="btn-drink-redo">解鎖重選</button>
+        <span class="lbl">餐點核銷 ＋ 主播抽的紅包獎金</span>
+
+        <div class="ops-row">
+          <div class="ops-line">
+            <span class="ops-name" id="ops-food-t">主食：—</span>
+            <button class="btn ghost mini" id="btn-food-done">核銷出餐</button>
+            <button class="btn ghost mini" id="btn-food-redo">解鎖重選</button>
+          </div>
+          <div class="ops-line ops-money" data-red="0">
+            <span class="ops-tag">連 1 線紅包</span>
+            <input class="inp ops-inp" id="ops-red0" type="text" inputmode="numeric" placeholder="獎金數字" />
+            <span class="ops-unit"></span>
+            <button class="btn ghost mini" data-save="0">存</button>
+          </div>
         </div>
 
-        <div id="ops-red" style="margin-top:14px">
-          <span class="lbl">紅包獎金登記</span>
-          <div class="team" style="gap:6px;margin-bottom:8px">
-            <span style="flex:1 1 100%;font-size:13px" id="ops-red1-t">紅包 1（連 1 線）：—</span>
-            <button class="btn ghost mini" data-red="0">登記金額</button>
+        <div class="ops-row">
+          <div class="ops-line">
+            <span class="ops-name" id="ops-drink-t">飲品：—</span>
+            <button class="btn ghost mini" id="btn-drink-done">核銷出餐</button>
+            <button class="btn ghost mini" id="btn-drink-redo">解鎖重選</button>
           </div>
-          <div class="team" style="gap:6px;margin-bottom:8px">
-            <span style="flex:1 1 100%;font-size:13px" id="ops-red2-t">紅包 2（連 2 線）：—</span>
-            <button class="btn ghost mini" data-red="1">登記金額</button>
+          <div class="ops-line ops-money" data-red="1">
+            <span class="ops-tag">連 2 線紅包</span>
+            <input class="inp ops-inp" id="ops-red1" type="text" inputmode="numeric" placeholder="獎金數字" />
+            <span class="ops-unit"></span>
+            <button class="btn ghost mini" data-save="1">存</button>
           </div>
-          <div class="team" style="gap:6px">
-            <span style="flex:1 1 100%;font-size:13px" id="ops-red3-t">紅包 3（全連）：—</span>
-            <button class="btn ghost mini" data-red="2">登記金額</button>
-          </div>
-          <p class="hint" id="ops-red-sum">合計：0</p>
         </div>
+
+        <div class="ops-row">
+          <div class="ops-line">
+            <span class="ops-name" id="ops-full-t">全連：—</span>
+          </div>
+          <div class="ops-line ops-money" data-red="2">
+            <span class="ops-tag">全連紅包</span>
+            <input class="inp ops-inp" id="ops-red2" type="text" inputmode="numeric" placeholder="獎金數字" />
+            <span class="ops-unit"></span>
+            <button class="btn ghost mini" data-save="2">存</button>
+          </div>
+        </div>
+
+        <p class="hint" id="ops-red-sum">累積獎金：0</p>
       </div>
 
       <div class="btn-row">
@@ -1219,28 +1255,35 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:rgba(2
     bindUndo("btn-drink-done","drinkDone","飲品");
   })();
 
-  // 紅包登記
-  $("ops-red").addEventListener("click", function(e){
-    var btn=e.target.closest("[data-red]"); if(!btn) return;
-    var i=parseInt(btn.getAttribute("data-red"),10);
-    var names=["紅包 1（連 1 線）","紅包 2（連 2 線）","紅包 3（全連）"];
-    var lines=countLines(), hits=countHits();
-    var earned = i===0 ? lines>=1 : (i===1 ? lines>=2 : hits===9);
-    ask({
-      title:names[i]+" 金額",
-      body:(earned? "這個紅包已達成，請填入實際抽到的金額。" : "⚠️ 這個紅包尚未達成（可先登記，但請確認）。")+
-           "\n單位："+RED_UNIT+"　填 0 ＝ 清除登記。",
-      input:true, placeholder:"金額（數字）", ok:"登記"
-    }, function(ok,val){
-      if(!ok) return;
-      var v=String(val).replace(/[^0-9]/g,"");
-      if(v===""){ toast("請輸入數字"); return; }
-      var amt=Number(v);
-      S.red[i]={amt:amt, at: amt>0 ? hhmm() : ""};
-      save(); render(); syncNow(true);
-      toast(amt>0 ? (names[i]+"："+fmtAmt(amt)+" "+RED_UNIT+" 已登記") : (names[i]+" 登記已清除"));
+  // 紅包獎金：核銷列旁邊直接輸入數字
+  function saveRed(i, raw){
+    var v=String(raw==null?"":raw).replace(/[^0-9]/g,"");
+    var amt = v==="" ? 0 : Number(v);
+    var prev = Number(S.red[i].amt||0);
+    if(amt===prev){ render(); return; }
+    S.red[i]={amt:amt, at: amt>0 ? hhmm() : ""};
+    save(); render(); syncNow(true);
+    var names=["連 1 線紅包","連 2 線紅包","全連紅包"];
+    toast(amt>0 ? (names[i]+"："+fmtAmt(amt)+" "+RED_UNIT+" 已登記")
+               : (names[i]+" 已清除"));
+  }
+
+  (function bindRedInputs(){
+    for(var i=0;i<3;i++){
+      (function(idx){
+        var inp=$("ops-red"+idx);
+        inp.addEventListener("keydown", function(e){
+          if(e.key==="Enter"){ e.preventDefault(); saveRed(idx, inp.value); inp.blur(); }
+        });
+        inp.addEventListener("blur", function(){ saveRed(idx, inp.value); });
+      })(i);
+    }
+    $("staff-ops").addEventListener("click", function(e){
+      var btn=e.target.closest("[data-save]"); if(!btn) return;
+      var idx=parseInt(btn.getAttribute("data-save"),10);
+      saveRed(idx, $("ops-red"+idx).value);
     });
-  });
+  })();
 
   $("btn-staff-close").addEventListener("click", function(){
     setStaffPanel(false); toast("面板已關閉，可交給用戶");
@@ -1453,15 +1496,30 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:rgba(2
                                    + (S.foodDone ? "　✅ 已出餐 "+S.foodDone : "");
     $("ops-drink-t").textContent = "飲品：" + (S.drink || (S.drinkPend ? S.drinkPend+"（用戶暫選，未送單）" : "—"))
                                    + (S.drinkDone ? "　✅ 已出餐 "+S.drinkDone : "");
-    $("ops-red").classList.toggle("hide", solo);
+    var redTotal = Number(S.red[0].amt||0)+Number(S.red[1].amt||0)+Number(S.red[2].amt||0);
+    $("ops-full-t").textContent = "全連：" + (hits===9 ? "已達成（9/9）" : hits+"/9");
+
+    // 單人軌沒有紅包 → 整排輸入欄隱藏
+    var moneyRows=document.querySelectorAll(".ops-money");
+    for(var mi=0;mi<moneyRows.length;mi++) moneyRows[mi].classList.toggle("hide", solo);
+    $("ops-red-sum").classList.toggle("hide", solo);
+
     if(!solo){
-      var labels=["紅包 1（連 1 線）","紅包 2（連 2 線）","紅包 3（全連）"], tot=0;
-      for(var ri=0;ri<3;ri++){
-        var r=S.red[ri], amt=Number(r.amt||0); tot+=amt;
-        $("ops-red"+(ri+1)+"-t").textContent = labels[ri]+"："+(amt>0 ? fmtAmt(amt)+" "+RED_UNIT+"（"+r.at+"）" : "—");
+      var units=document.querySelectorAll(".ops-unit");
+      for(var ui=0;ui<units.length;ui++) units[ui].textContent=RED_UNIT;
+      for(var qi=0;qi<3;qi++){
+        var el=$("ops-red"+qi), amt=Number(S.red[qi].amt||0);
+        if(document.activeElement!==el) el.value = amt>0 ? String(amt) : "";
+        el.parentNode.classList.toggle("saved", amt>0);
       }
-      $("ops-red-sum").textContent = "合計："+fmtAmt(tot)+" "+RED_UNIT;
+      $("ops-red-sum").textContent="累積獎金："+fmtAmt(redTotal)+" "+RED_UNIT+
+        (S.red[0].at||S.red[1].at||S.red[2].at ? "（最後登記 "+(S.red[2].at||S.red[1].at||S.red[0].at)+"）" : "");
     }
+
+    // 賓果卡上的累積獎金
+    $("card-money").classList.toggle("hide", solo || redTotal<=0);
+    $("card-money-v").textContent=fmtAmt(redTotal);
+    $("card-money-u").textContent=RED_UNIT;
 
     $("in-wish").value=S.wish;
     $("wish-note").textContent = S.wish ? ("已送出："+S.wish) : "寫好後按「送出」，主辦才收得到。";

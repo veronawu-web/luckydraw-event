@@ -165,13 +165,21 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:rgba(2
 
     <div style="margin-top:16px">
       <span class="lbl">卡片類型</span>
-      <label class="opt sel" id="opt-preset"><input type="radio" name="ctype" value="preset" checked /><span>預設卡（9 格已排好）</span></label>
-      <label class="opt" id="opt-custom"><input type="radio" name="ctype" value="custom" /><span>自建卡（現場自己填 9 格）</span></label>
+      <label class="opt sel" id="opt-preset"><input type="radio" name="ctype" value="preset" checked /><span>預設卡（9 格已排好，直接開始）</span></label>
+      <label class="opt" id="opt-pick"><input type="radio" name="ctype" value="pick" /><span>自選卡（從題庫挑 9 題）</span></label>
     </div>
 
-    <div id="custom-box" class="hide" style="margin-top:14px">
-      <span class="lbl">自建 9 格任務・不可重複</span>
-      <div id="custom-inputs"></div>
+    <div id="pick-box" class="hide" style="margin-top:14px">
+      <div class="sec-t" style="margin-bottom:8px">
+        <span class="lbl" style="margin:0">題庫・挑 9 題</span>
+        <span class="lat" id="pick-count" style="font-family:var(--cond);font-size:12px;color:var(--powder)">已選 0 / 9</span>
+      </div>
+      <div class="btn-row" style="margin:0 0 10px">
+        <button class="btn ghost mini" id="btn-pick-random" type="button">隨機幫我選 9 題</button>
+        <button class="btn ghost mini" id="btn-pick-clear" type="button">清空</button>
+      </div>
+      <div id="pick-list"></div>
+      <p class="hint">選好的順序就是格子順序（1→9）。選滿 9 題才能鎖卡。</p>
     </div>
 
     <div class="btn-row">
@@ -191,6 +199,7 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:rgba(2
         <span class="chip" id="chip-host">主播</span>
         <span class="chip gold" id="chip-type">預設卡</span>
         <span class="chip sync" id="chip-sync">未連線後台</span>
+        <span class="chip gold hide" id="chip-staff">核銷模式開啟中</span>
       </div>
       <div class="stats">
         <div class="stat"><div class="n" id="s-cell">0<span style="font-size:13px;color:var(--on-dark-3)">/9</span></div><div class="k">已蓋章</div></div>
@@ -202,7 +211,7 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:rgba(2
     <div class="card paper">
       <div class="sec-t"><h2>任務卡</h2><span class="lat">tap to stamp</span></div>
       <div class="grid" id="grid"></div>
-      <p class="locked-note">點格子＝蓋章。<b>第 9 格（最後一格）需工作人員輸入現場碼</b>核銷。誤按可長按格子取消。</p>
+      <p class="locked-note"><b>每一格都要工作人員核銷</b>：點格子後輸入現場碼才會蓋章。誤按可長按格子取消（同樣需要現場碼）。</p>
     </div>
 
     <div class="card paper">
@@ -234,7 +243,7 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:rgba(2
         <button class="btn ghost mini" id="btn-unlock">解鎖卡片</button>
         <button class="btn ghost mini" id="btn-reset">換下一位（清除本機）</button>
       </div>
-      <p class="hint">現場碼預設 <code>0829</code>（檔案內 <code>STAFF_CODE</code>）。後台網址填在 <code>GAS_URL</code>；沒填或斷網時會存成待送佇列，恢復後自動補送。</p>
+      <p class="hint"><b>每一格核銷都要現場碼</b>，預設 <code>0829</code>（檔案內 <code>STAFF_CODE</code>）。若嫌一格一格輸入太慢，把 <code>STAFF_SESSION_SEC</code> 改成 120，輸入一次後 120 秒內可連續核銷。<br />後台網址填在 <code>GAS_URL</code>；沒填就是「只存本機」，斷網時會存成待送佇列，恢復後自動補送。</p>
     </div>
 
   </section>
@@ -270,11 +279,15 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:rgba(2
   /* ============================================================
      ① 上線前要改的三個常數
      ============================================================ */
-  // 工作人員現場碼
+  // 工作人員現場碼（每一格蓋章都要輸入）
   var STAFF_CODE = "0829";
 
+  // 核銷模式秒數：0 = 每一格都要重新輸入現場碼（最嚴，預設）
+  //               例如 120 = 輸入一次後 120 秒內可連續核銷多格，時間到自動關閉
+  var STAFF_SESSION_SEC = 0;
+
   // Google Apps Script 部署網址（/exec 結尾）。留空＝只存本機、不回傳。
-  var GAS_URL = "https://script.google.com/macros/s/AKfycbzbRqxAR6ehgiP_Mx-7tB1EEjSP6vWBRbuYu_Qm_81UmgRhmUCxlZ-djK-fOd7fqc7URw/exec";
+  var GAS_URL = "";
 
   // 這台裝置的代號（多台平板時方便對帳，可留空自動產生）
   var DEVICE_ID = "";
@@ -283,8 +296,8 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:rgba(2
      ② 任務卡（現場要改直接改這兩個陣列）
      ============================================================ */
 
-  // 1v1 組隊卡：主播 × 用戶一起完成
-  var PRESET_DUO = [
+  // 題庫｜1v1 組隊（主播 × 用戶一起完成）。前 9 題＝預設卡；自選卡從整份題庫挑 9 題
+  var BANK_DUO = [
     "合唱一首歌的副歌",
     "互相幫對方點一首歌，各唱一段",
     "默契題：主播出 3 題，用戶答對 2 題",
@@ -293,11 +306,22 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:rgba(2
     "猜歌前奏，你們這組答對 1 題",
     "麥克風接力：一人一句唱完一段不中斷",
     "別組表演時當應援團，完整一首",
-    "拍一張兩人合照（可用道具）"
+    "拍一張兩人合照（可用道具）",
+    "各唱一首對方沒聽過的歌",
+    "一起唱一首台語歌",
+    "挑一首英文歌，合唱副歌",
+    "用戶幫主播選一首「最適合她」的歌並說原因",
+    "主播幫用戶選一首「今天最像你」的歌",
+    "合唱一首 90 年代金曲",
+    "一起無伴奏清唱一段（8 句以內）",
+    "跟另一組交換點歌權，唱對方點的歌",
+    "一起唱一首動漫或遊戲主題曲",
+    "兩人一起跟主持人玩一次現場小遊戲",
+    "幫全場點一首大合唱，並帶頭開口"
   ];
 
-  // 單人闖關卡：不需要固定主播，靠自己＋現場其他人
-  var PRESET_SOLO = [
+  // 題庫｜單人闖關（不綁定特定主播，靠自己＋現場其他人）
+  var BANK_SOLO = [
     "拿麥克風說出你的 ID ＋ 今天最想聽的歌",
     "獨唱一首完整的歌",
     "幫任一位主播點一首她會唱的歌",
@@ -306,7 +330,18 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:rgba(2
     "找工作人員或主持人合唱一首",
     "別人表演時上前應援，完整一首",
     "跟任一組交換一個「今天才知道的事」",
-    "全場大合唱時入鏡合照"
+    "全場大合唱時入鏡合照",
+    "獨唱一首台語歌",
+    "獨唱一首英文歌（副歌即可）",
+    "幫全場點一首大合唱，並帶頭開口",
+    "跟三位不同的人各交換一句話",
+    "唱一首你的 KTV 定番",
+    "跟另一位單人參加者交換點歌權",
+    "找主持人玩一次現場小遊戲",
+    "唱一首動漫或遊戲主題曲",
+    "幫任一組拍一張合照",
+    "說出今天聽到最喜歡的一首歌，點來唱一段",
+    "無伴奏清唱 4 句，讓旁邊的人猜歌名"
   ];
 
   var FOOD = ["麻辣燙和牛牛肉麵","大紅袍炭香紅燒牛肉麵","韓式碳烤帶骨牛小排包生菜","韓式醬烤豬五花包生菜","蒜香和牛炒飯"];
@@ -320,9 +355,11 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:rgba(2
   /* ============================================================
      狀態
      ============================================================ */
+  function bank(mode){ return (mode==="solo"?BANK_SOLO:BANK_DUO); }
+
   var S = {
     mode:"duo", user:"", host:"", type:"preset",
-    tasks:PRESET_DUO.slice(),
+    tasks:BANK_DUO.slice(0,9),
     hits:[false,false,false,false,false,false,false,false,false],
     locked:false, food:"", drink:"", wish:"", firstAll:false,
     startedAt:"", device:""
@@ -348,7 +385,7 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:rgba(2
       if(o.mode==="solo"||o.mode==="duo") S.mode=o.mode;
       if(typeof o.user==="string") S.user=o.user;
       if(typeof o.host==="string") S.host=o.host;
-      if(o.type==="custom"||o.type==="preset") S.type=o.type;
+      if(o.type==="pick"||o.type==="preset") S.type=o.type;
       if(Array.isArray(o.tasks)&&o.tasks.length===9) S.tasks=o.tasks.map(String);
       if(Array.isArray(o.hits)&&o.hits.length===9) S.hits=o.hits.map(Boolean);
       S.locked=!!o.locked; S.firstAll=!!o.firstAll;
@@ -383,7 +420,7 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:rgba(2
       mode:S.mode,                       // duo | solo
       user:S.user,
       host:S.mode==="solo" ? "" : S.host,
-      cardType:S.type,                   // preset | custom
+      cardType:S.type,                   // preset | pick
       tasks:S.tasks,
       hits:S.hits.map(function(b){ return b?1:0; }),
       stamps:hits,
@@ -470,7 +507,7 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:rgba(2
   function countHits(){ var n=0; for(var i=0;i<9;i++) if(S.hits[i]) n++; return n; }
   function countLines(){ var n=0; for(var i=0;i<LINES.length;i++){ var L=LINES[i]; if(S.hits[L[0]]&&S.hits[L[1]]&&S.hits[L[2]]) n++; } return n; }
   function stampsLeft(){ return 9-countHits(); }
-  function presetFor(mode){ return (mode==="solo"?PRESET_SOLO:PRESET_DUO).slice(); }
+  function presetFor(mode){ return bank(mode).slice(0,9); }
 
   var toastT=null;
   function toast(msg){
@@ -501,32 +538,67 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:rgba(2
   /* ============================================================
      Step 1
      ============================================================ */
-  function buildCustomInputs(){
-    var box=$("custom-inputs"); box.innerHTML="";
-    for(var i=0;i<9;i++){
-      var w=document.createElement("div"); w.style.marginBottom="7px";
-      w.innerHTML='<input class="inp ct" data-i="'+i+'" type="text" maxlength="26" placeholder="第 '+(i+1)+' 格任務" />';
-      box.appendChild(w);
+  var picked=[];   // 自選卡：已選題目（依選擇順序）
+
+  function buildPickList(){
+    var box=$("pick-list"); box.innerHTML="";
+    var arr=bank(S.mode);
+    for(var i=0;i<arr.length;i++){
+      var n=picked.indexOf(arr[i]);
+      var lab=document.createElement("label");
+      lab.className="opt pk"+(n>-1?" sel":"");
+      lab.setAttribute("data-q", arr[i]);
+      lab.innerHTML='<input type="checkbox"'+(n>-1?" checked":"")+' />'+
+        '<span style="flex:1">'+esc(arr[i])+'</span>'+
+        (n>-1?'<span style="font-family:var(--cond);font-size:12px;color:var(--hot)">'+(n+1)+'</span>':'');
+      box.appendChild(lab);
     }
-    if(S.type==="custom"){
-      var ins=box.querySelectorAll(".ct");
-      for(var j=0;j<ins.length;j++) if(S.tasks[j]) ins[j].value=S.tasks[j];
-    }
+    $("pick-count").textContent="已選 "+picked.length+" / 9";
+    $("pick-count").style.color = picked.length===9 ? "var(--ok)" : "var(--powder)";
   }
+
+  function bindPickList(){
+    $("pick-list").addEventListener("click", function(e){
+      var lab=e.target.closest(".pk"); if(!lab) return;
+      e.preventDefault();
+      var q=lab.getAttribute("data-q");
+      var at=picked.indexOf(q);
+      if(at>-1) picked.splice(at,1);
+      else{
+        if(picked.length>=9){ toast("已經選滿 9 題，先取消一題再選"); buildPickList(); return; }
+        picked.push(q);
+      }
+      buildPickList();
+    });
+    $("btn-pick-random").addEventListener("click", function(){
+      var arr=bank(S.mode).slice();
+      for(var i=arr.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=arr[i]; arr[i]=arr[j]; arr[j]=t; }
+      picked=arr.slice(0,9); buildPickList(); toast("已隨機選 9 題，可再手動調整");
+    });
+    $("btn-pick-clear").addEventListener("click", function(){ picked=[]; buildPickList(); });
+  }
+
   function syncSetupUI(){
-    var custom=S.type==="custom", solo=S.mode==="solo";
-    $("custom-box").classList.toggle("hide",!custom);
-    $("opt-preset").classList.toggle("sel",!custom);
-    $("opt-custom").classList.toggle("sel",custom);
+    var pick=S.type==="pick", solo=S.mode==="solo";
+    // 把實體 radio 對齊狀態（清除本機後，畫面不能還停在上一位的選擇）
+    var rm=document.querySelectorAll('input[name="mode"]');
+    for(var a=0;a<rm.length;a++) rm[a].checked = (rm[a].value===(solo?"solo":"duo"));
+    var rt=document.querySelectorAll('input[name="ctype"]');
+    for(var c=0;c<rt.length;c++) rt[c].checked = (rt[c].value===(pick?"pick":"preset"));
+    $("pick-box").classList.toggle("hide",!pick);
+    $("opt-preset").classList.toggle("sel",!pick);
+    $("opt-pick").classList.toggle("sel",pick);
     $("opt-duo").classList.toggle("sel",!solo);
     $("opt-solo").classList.toggle("sel",solo);
     $("host-wrap").classList.toggle("hide",solo);
+    if(pick) buildPickList();
   }
 
   var modeRadios=document.querySelectorAll('input[name="mode"]');
   for(var mi=0;mi<modeRadios.length;mi++){
     modeRadios[mi].addEventListener("change", function(){
       S.mode = this.value==="solo" ? "solo" : "duo";
+      picked=[];                              // 換軌＝換題庫，已選的清掉
       if(S.type==="preset") S.tasks=presetFor(S.mode);
       syncSetupUI(); save();
     });
@@ -534,7 +606,7 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:rgba(2
   var typeRadios=document.querySelectorAll('input[name="ctype"]');
   for(var ti=0;ti<typeRadios.length;ti++){
     typeRadios[ti].addEventListener("change", function(){
-      S.type = this.value==="custom" ? "custom" : "preset";
+      S.type = this.value==="pick" ? "pick" : "preset";
       if(S.type==="preset") S.tasks=presetFor(S.mode);
       syncSetupUI(); save();
     });
@@ -546,15 +618,9 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:rgba(2
     if(S.mode==="duo" && !h){ toast("1v1 組隊需要填組隊主播"); return; }
 
     var tasks;
-    if(S.type==="custom"){
-      tasks=[]; var ins=document.querySelectorAll("#custom-inputs .ct");
-      for(var i=0;i<ins.length;i++) tasks.push(ins[i].value.trim());
-      for(var k=0;k<9;k++) if(!tasks[k]){ toast("自建卡要填滿 9 格（第 "+(k+1)+" 格未填）"); return; }
-      var seen={};
-      for(var m=0;m<9;m++){
-        if(seen[tasks[m]]){ toast("任務不可重複：「"+tasks[m]+"」"); return; }
-        seen[tasks[m]]=1;
-      }
+    if(S.type==="pick"){
+      if(picked.length!==9){ toast("自選卡要挑滿 9 題（目前 "+picked.length+" 題）"); return; }
+      tasks=picked.slice();
     }else{
       tasks=presetFor(S.mode);
     }
@@ -568,32 +634,58 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:rgba(2
   /* ============================================================
      Step 2：蓋章
      ============================================================ */
+  // 核銷模式（STAFF_SESSION_SEC > 0 時才會用到）
+  var staffUntil=0, staffT=null;
+  function staffOpen(){ return STAFF_SESSION_SEC>0 && Date.now()<staffUntil; }
+  function staffStart(){
+    if(STAFF_SESSION_SEC<=0) return;
+    staffUntil=Date.now()+STAFF_SESSION_SEC*1000;
+    if(staffT) clearTimeout(staffT);
+    staffT=setTimeout(function(){ staffUntil=0; render(); toast("核銷模式已關閉"); }, STAFF_SESSION_SEC*1000);
+    render();
+  }
+
+  // 每一格都要工作人員核銷
   function doStamp(i){
     if(S.hits[i]) return;
-    if(stampsLeft()===1){
-      ask({title:"第 9 格核銷", body:"這是最後一格，需工作人員輸入現場碼登記全連。",
-           input:true, placeholder:"現場碼", ok:"核銷"}, function(ok,val){
-        if(!ok) return;
-        if(String(val).trim()!==STAFF_CODE){ toast("現場碼不正確"); return; }
-        S.hits[i]=true; S.firstAll=true; save(); render(); syncNow(true);
-        toast("全連完成！請登記第一名與 5,000 點餐額度");
-      });
-      return;
+    var isLast = stampsLeft()===1;
+
+    function commit(){
+      var before=countLines();
+      S.hits[i]=true;
+      if(isLast) S.firstAll=true;
+      save(); render();
+      if(isLast) syncNow(true); else syncSoon();
+      var after=countLines();
+      if(isLast) toast("全連完成！請登記第一名與 5,000 點餐額度");
+      else if(after>before){
+        if(after===1) toast("連 1 線！可選 1 份主食 ＋ 抽紅包 ×1");
+        else if(after===2) toast("連 2 線！可選 1 樣飲品 ＋ 抽紅包 ×1");
+        else toast("目前 "+after+" 線");
+      }else toast("第 "+(i+1)+" 格已核銷");
     }
-    var before=countLines();
-    S.hits[i]=true; save(); render(); syncSoon();
-    var after=countLines();
-    if(after>before){
-      if(after===1) toast("連 1 線！可選 1 份主食 ＋ 抽紅包 ×1");
-      else if(after===2) toast("連 2 線！可選 1 樣飲品 ＋ 抽紅包 ×1");
-      else toast("目前 "+after+" 線");
-    }
+
+    if(staffOpen()){ commit(); return; }
+
+    ask({
+      title: isLast ? "最後一格・全連核銷" : "第 "+(i+1)+" 格核銷",
+      body: "「"+S.tasks[i]+"」\n\n請工作人員確認任務完成後輸入現場碼。" +
+            (isLast ? "\n這一格會登記全連，請同時確認是否為第一名。" : ""),
+      input:true, placeholder:"現場碼", ok:"核銷"
+    }, function(ok,val){
+      if(!ok) return;
+      if(String(val).trim()!==STAFF_CODE){ toast("現場碼不正確，未核銷"); return; }
+      staffStart();
+      commit();
+    });
   }
 
   function undoStamp(i){
     if(!S.hits[i]) return;
-    ask({title:"取消這一格？", body:"「"+S.tasks[i]+"」的蓋章會被移除。", ok:"取消蓋章"}, function(ok){
+    ask({title:"取消這一格？", body:"「"+S.tasks[i]+"」的蓋章會被移除，需工作人員現場碼。",
+         input:true, placeholder:"現場碼", ok:"取消蓋章"}, function(ok,val){
       if(!ok) return;
+      if(String(val).trim()!==STAFF_CODE){ toast("現場碼不正確"); return; }
       S.hits[i]=false; if(countHits()<9) S.firstAll=false;
       save(); render(); syncSoon(); toast("已取消該格蓋章");
     });
@@ -673,7 +765,7 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:rgba(2
         S.mode = (d.mode==="solo")?"solo":"duo";
         S.user = d.user||user;
         S.host = d.host||"";
-        S.type = (d.cardType==="custom")?"custom":"preset";
+        S.type = (d.cardType==="pick")?"pick":"preset";
         if(Array.isArray(d.tasks)&&d.tasks.length===9) S.tasks=d.tasks.map(String);
         else S.tasks=presetFor(S.mode);
         if(Array.isArray(d.hits)&&d.hits.length===9) S.hits=d.hits.map(function(v){ return !!Number(v); });
@@ -716,7 +808,8 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:rgba(2
       if(String(val).trim()!==STAFF_CODE){ toast("現場碼不正確"); return; }
       if(GAS_URL && S.locked && S.user){ try{ post(payload()); }catch(e){} }
       lsDel(STORE_KEY); memStore=null;
-      S={mode:"duo",user:"",host:"",type:"preset",tasks:PRESET_DUO.slice(),
+      picked=[];
+      S={mode:"duo",user:"",host:"",type:"preset",tasks:BANK_DUO.slice(0,9),
          hits:[false,false,false,false,false,false,false,false,false],
          locked:false,food:"",drink:"",wish:"",firstAll:false,startedAt:"",device:deviceId()};
       save(); render(); toast("已清除，可交給下一位");
@@ -731,7 +824,7 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:rgba(2
       "【女神點唱 BINGO 結算】8/29 oncor\n"+
       "形式："+(S.mode==="solo"?"單人闖關":"1v1 組隊")+"\n"+
       "用戶："+S.user+(S.mode==="solo"?"":"　主播："+S.host)+"\n"+
-      "卡片："+(S.type==="custom"?"自建卡":"預設卡")+"\n"+
+      "卡片："+(S.type==="pick"?"自選卡":"預設卡")+"\n"+
       "蓋章："+hits+"/9　連線："+lines+" 線\n"+
       "主食："+(S.food||"—")+"\n"+
       "飲品："+(S.drink||"—")+"\n"+
@@ -771,11 +864,12 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:rgba(2
     $("chip-host").classList.toggle("hide",solo);
     $("chip-x").classList.toggle("hide",solo);
     if(!solo) $("chip-host").textContent="主播 "+S.host;
-    $("chip-type").textContent=(solo?"單人闖關・":"1v1・")+(S.type==="custom"?"自建卡":"預設卡");
+    $("chip-type").textContent=(solo?"單人闖關・":"1v1・")+(S.type==="pick"?"自選卡":"預設卡");
 
+    $("chip-staff").classList.toggle("hide", !staffOpen());
     var sc=$("chip-sync"); sc.className="chip sync";
     var q=queueRead().length;
-    if(!GAS_URL){ sc.textContent="未接後台"; sc.classList.add("warn"); }
+    if(!GAS_URL){ sc.textContent="只存本機・未填後台網址"; sc.classList.add("warn"); }
     else if(syncState==="sending"){ sc.textContent="同步中…"; }
     else if(syncState==="pending"){ sc.textContent="待同步"; sc.classList.add("warn"); }
     else if(syncState==="queued"){ sc.textContent="待送 "+q+" 筆"; sc.classList.add("err"); }
@@ -809,7 +903,8 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:rgba(2
   load();
   S.device=deviceId();
   if(S.type==="preset") S.tasks=presetFor(S.mode);
-  buildCustomInputs();
+  bindPickList();
+  if(S.type==="pick") buildPickList();
   bindGrid();
   bindMenus();
   render();

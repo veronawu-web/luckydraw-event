@@ -718,7 +718,7 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:rgba(2
   var PRIZE_TOP_N = 2;
   var PRIZE_CREDIT = 5000;
   // 抽紅包：只有 1v1（主播組隊）有 —— 紅包是主播抽的，單人軌沒有。
-  // 點餐額度：單人闖關只要全連 9 格就有 5,000，不看名次；1v1 則是前 2 名才有。
+  // 點餐額度：全場共用一個名次（1v1 與單人一起排），只有前 2 名有 5,000。
   var SOLO_JOINS_CREDIT = true;
 
   // ── CTA：填了才會出現。QR 由頁面自己畫，現場沒網路也掃得到
@@ -858,7 +858,7 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:rgba(2
       redTotal:Number(S.red[0].amt||0)+Number(S.red[1].amt||0)+Number(S.red[2].amt||0),
       fullHouse:hits===9?1:0,
       rank:Number(S.rank||0),
-      prizeCredit:(hits===9 && (S.mode==="solo" ? SOLO_JOINS_CREDIT : (S.rank>=1 && S.rank<=PRIZE_TOP_N))) ? PRIZE_CREDIT : 0,
+      prizeCredit:(hits===9 && (S.mode!=="solo"||SOLO_JOINS_CREDIT) && S.rank>=1 && S.rank<=PRIZE_TOP_N) ? PRIZE_CREDIT : 0,
       startedAt:S.startedAt,
       finished:hits===9?1:0
     };
@@ -1115,9 +1115,7 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:rgba(2
       save(); render();
       if(isLast) syncNow(true); else syncSoon();
       var after=countLines();
-      if(isLast) toast(S.mode==="solo"
-        ? (SOLO_JOINS_CREDIT ? "全連完成！可得 "+fmtAmt(PRIZE_CREDIT)+" 點餐額度" : "全連完成！挑戰達成")
-        : "全連完成！請工作人員登記名次（前 "+PRIZE_TOP_N+" 名有 "+fmtAmt(PRIZE_CREDIT)+" 點餐額度）");
+      if(isLast) toast("全連完成！請工作人員登記全場名次（前 "+PRIZE_TOP_N+" 名有 "+fmtAmt(PRIZE_CREDIT)+" 點餐額度）");
       else if(after>before){
         if(after===1) toast("連 1 線！可選 1 份主食"+(S.mode==="solo"?"":" ＋ 抽紅包 ×1"));
         else if(after===2) toast("連 2 線！可選 1 樣飲品"+(S.mode==="solo"?"":" ＋ 抽紅包 ×1"));
@@ -1383,8 +1381,8 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:rgba(2
   function joinsFullHouse(){ return S.mode!=="solo" || SOLO_JOINS_CREDIT; }
   function hasCredit(){
     if(countHits()!==9) return false;
-    if(S.mode==="solo") return SOLO_JOINS_CREDIT;            // 單人：全連就有，不看名次
-    return S.rank>=1 && S.rank<=PRIZE_TOP_N;                  // 1v1：前 2 名
+    if(S.mode==="solo" && !SOLO_JOINS_CREDIT) return false;
+    return S.rank>=1 && S.rank<=PRIZE_TOP_N;   // 全場共用名次，前 2 名才有
   }
   function saveRank(raw){
     var v=String(raw==null?"":raw).replace(/[^0-9]/g,"");
@@ -1495,7 +1493,7 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:rgba(2
               "　合計 "+fmtAmt(Number(S.red[0].amt)+Number(S.red[1].amt)+Number(S.red[2].amt))+" "+RED_UNIT+"\n"))+
       (solo ? "已解鎖餐點："+countMeals()+" 項\n" : "可抽紅包："+red+" 次\n")+
       "全連："+(hits===9
-        ? (solo ? ("是（單人軌"+(SOLO_JOINS_CREDIT?"・"+fmtAmt(PRIZE_CREDIT)+" 點餐額度":"")+"）")
+        ? ((solo && !SOLO_JOINS_CREDIT) ? "是（單人軌）"
                 : "是・"+(S.rank>=1
                     ? ("第 "+S.rank+" 名"+(S.rank<=PRIZE_TOP_N?"（給 "+fmtAmt(PRIZE_CREDIT)+" 點餐額度）":"（僅抽紅包）"))
                     : "名次未登記"))
@@ -1693,11 +1691,11 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:rgba(2
       : "尚未達成";
     var rk=Number(S.rank||0);
     $("t3-st").textContent = hits===9
-      ? (solo ? (SOLO_JOINS_CREDIT ? "已全連・"+fmtAmt(PRIZE_CREDIT)+" 點餐額度" : "已完成全部 9 格・挑戰達成")
+      ? ((solo && !SOLO_JOINS_CREDIT) ? "已完成全部 9 格・挑戰達成"
               : (rk<1 ? "已全連・待工作人員登記名次"
                       : (rk<=PRIZE_TOP_N
                           ? "第 "+rk+" 名・"+fmtAmt(PRIZE_CREDIT)+" 點餐額度"+(!solo&&r3>0?"・紅包 "+fmtAmt(r3)+" "+RED_UNIT:"")
-                          : (solo ? "第 "+rk+" 名・挑戰達成（無額外獎勵）"
+                          : (solo ? "第 "+rk+" 名・未進前 "+PRIZE_TOP_N+" 名"
                                   : "第 "+rk+" 名・僅抽紅包"+(r3>0?" "+fmtAmt(r3)+" "+RED_UNIT:"")))))
       : "尚未達成";
 
@@ -1706,11 +1704,11 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:rgba(2
     $("t2-tx").innerHTML = "<b>選 1 樣飲品（"+DRINK.length+" 選 1）</b>"+rTail;
     $("t3-tx").innerHTML = solo
       ? (SOLO_JOINS_CREDIT
-          ? "<b>完成 9 格得 "+fmtAmt(PRIZE_CREDIT)+" 點餐額度</b><br>"+
-            "<span style=\"font-size:12px\">（抽紅包限主播組隊）</span>"
+          ? "<b>全場前 "+PRIZE_TOP_N+" 名全連得 "+fmtAmt(PRIZE_CREDIT)+" 點餐額度</b><br>"+
+            "<span style=\"font-size:12px\">名次與 1v1 一起排（抽紅包限主播組隊）</span>"
           : "<b>完成全部 9 格</b> 挑戰達成")
-      : "<b>前 "+PRIZE_TOP_N+" 名得 "+fmtAmt(PRIZE_CREDIT)+" 點餐額度</b> ＋抽紅包 ×1<br>"+
-        "<span style=\"font-size:12px\">第 "+(PRIZE_TOP_N+1)+" 名以後全連：抽紅包 ×1</span>";
+      : "<b>全場前 "+PRIZE_TOP_N+" 名得 "+fmtAmt(PRIZE_CREDIT)+" 點餐額度</b> ＋抽紅包 ×1<br>"+
+        "<span style=\"font-size:12px\">第 "+(PRIZE_TOP_N+1)+" 名以後全連：抽紅包 ×1（名次全場共用）</span>";
     $("food-h").textContent="主食 "+FOOD.length+" 選 1";
     $("drink-h").textContent="飲品 "+DRINK.length+" 選 1";
     $("s-red-k").textContent = solo ? "已解鎖餐點" : "可抽紅包";
@@ -1740,17 +1738,17 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:rgba(2
                                    + (S.drinkDone ? "　✅ 已出餐 "+S.drinkDone : "");
     var redTotal = Number(S.red[0].amt||0)+Number(S.red[1].amt||0)+Number(S.red[2].amt||0);
     $("ops-full-t").textContent = "全連：" + (hits===9 ? "已達成（9/9）" : hits+"/9");
-    var joins = !solo;
+    var joins = !solo || SOLO_JOINS_CREDIT;
     $("ops-rank-row").classList.toggle("hide", !joins);
     $("ops-rank-note").classList.toggle("hide", !joins);
     if(joins){
       var rkv=Number(S.rank||0);
       if(document.activeElement!==$("ops-rank")) $("ops-rank").value = rkv>0 ? String(rkv) : "";
       $("ops-rank-note").textContent = rkv<1
-        ? ("前 "+PRIZE_TOP_N+" 名得 "+fmtAmt(PRIZE_CREDIT)+" 點餐額度＋抽紅包；之後全連只有抽紅包。")
+        ? ("名次全場共用（1v1 與單人一起排）。前 "+PRIZE_TOP_N+" 名得 "+fmtAmt(PRIZE_CREDIT)+" 點餐額度"+(solo?"。":"＋抽紅包。"))
         : (rkv<=PRIZE_TOP_N
-            ? ("✅ 第 "+rkv+" 名 → 給 "+fmtAmt(PRIZE_CREDIT)+" 點餐額度 ＋ 抽紅包")
-            : ("第 "+rkv+" 名 → 只有抽紅包，不給點餐額度"));
+            ? ("✅ 第 "+rkv+" 名 → 給 "+fmtAmt(PRIZE_CREDIT)+" 點餐額度"+(solo?"":" ＋ 抽紅包"))
+            : ("第 "+rkv+" 名 → 不給點餐額度"+(solo?"":"，只有抽紅包")));
     }
 
     // 紅包欄位：單人軌完全隱藏
@@ -1779,7 +1777,7 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:rgba(2
     var credit=hasCredit();
     $("card-credit").classList.toggle("hide", !credit);
     if(credit){
-      $("card-credit-k").textContent = solo ? "全連達成・點餐額度" : ("第 "+rk+" 名・點餐額度");
+      $("card-credit-k").textContent = "第 "+rk+" 名・點餐額度";
       $("card-credit-v").textContent=fmtAmt(PRIZE_CREDIT);
     }
 

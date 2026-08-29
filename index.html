@@ -265,6 +265,10 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:rgba(2
         <span class="k">累積紅包獎金</span>
         <span><span class="v" id="card-money-v">0</span> <span class="b" id="card-money-u"></span></span>
       </div>
+      <div class="money-badge hide" id="card-credit" style="background:linear-gradient(180deg,rgba(230,61,136,.16),rgba(230,61,136,.07));border-color:rgba(230,61,136,.45)">
+        <span class="k" style="color:#a3145c" id="card-credit-k">點餐額度</span>
+        <span><span class="v" id="card-credit-v" style="color:#a3145c">0</span></span>
+      </div>
       <p class="locked-note"><b>每一格都要工作人員核銷</b>：點格子後輸入現場碼才會蓋章。誤按可長按格子取消（同樣需要現場碼）。</p>
     </div>
 
@@ -362,6 +366,13 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:rgba(2
           <div class="ops-line">
             <span class="ops-name" id="ops-full-t">全連：—</span>
           </div>
+          <div class="ops-line" id="ops-rank-row">
+            <span class="ops-tag">全連名次</span>
+            <input class="inp ops-inp" id="ops-rank" type="text" inputmode="numeric" placeholder="第幾名" />
+            <span class="ops-unit">名</span>
+            <button class="btn ghost mini" id="btn-rank-save">存</button>
+          </div>
+          <p class="hint" id="ops-rank-note" style="margin:6px 0 0"></p>
           <div class="ops-line ops-money" data-red="2">
             <span class="ops-tag">全連紅包</span>
             <input class="inp ops-inp" id="ops-red2" type="text" inputmode="numeric" placeholder="獎金數字" />
@@ -702,6 +713,10 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:rgba(2
   // ── 紅包金額單位（顯示用）
   var RED_UNIT = "鑽";
 
+  // ── 全連獎勵：前 N 名才有點餐額度，其餘只有抽紅包
+  var PRIZE_TOP_N = 2;
+  var PRIZE_CREDIT = 5000;
+
   // ── CTA：填了才會出現。QR 由頁面自己畫，現場沒網路也掃得到
   var LINE_URL   = "https://line.me/R/ti/p/@616fbpbu";                       // 活動 LINE@ 加入連結
   var LINE_TITLE = "加入活動 LINE@ 送 2,000 鑽石";
@@ -727,6 +742,7 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:rgba(2
     tasks:BANK_DUO.slice(0,9),
     hits:[false,false,false,false,false,false,false,false,false],
     locked:false, food:"", drink:"", wish:"", firstAll:false,
+    rank:0,                                // 全連名次（工作人員登記，0＝未登記）
     foodPend:"", drinkPend:"",            // 用戶暫選、還沒按「確認送出」
     foodDone:"", drinkDone:"",            // 出餐核銷時間（HH:MM）
     red:[{amt:0,at:""},{amt:0,at:""},{amt:0,at:""}],   // 連1線／連2線／全連 的紅包
@@ -780,6 +796,7 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:rgba(2
       if(typeof o.food==="string") S.food=o.food;
       if(typeof o.drink==="string") S.drink=o.drink;
       if(typeof o.wish==="string") S.wish=o.wish;
+      if(typeof o.rank==="number"||typeof o.rank==="string") S.rank=Number(o.rank)||0;
       if(typeof o.foodPend==="string") S.foodPend=o.foodPend;
       if(typeof o.drinkPend==="string") S.drinkPend=o.drinkPend;
       if(typeof o.foodDone==="string") S.foodDone=o.foodDone;
@@ -802,7 +819,7 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:rgba(2
   function sigOf(p){
     return [p.mode,p.user,p.host,p.cardType,p.stamps,p.lines,
             p.food,p.drink,p.wish,p.fullHouse,p.mealsUnlocked,
-            p.foodDone,p.drinkDone,p.red1,p.red2,p.red3,
+            p.foodDone,p.drinkDone,p.red1,p.red2,p.red3,p.rank,p.prizeCredit,
             (p.tasks||[]).join("|"),(p.hits||[]).join("")].join("\u0001");
   }
 
@@ -836,6 +853,8 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:rgba(2
       red1:Number(S.red[0].amt||0), red2:Number(S.red[1].amt||0), red3:Number(S.red[2].amt||0),
       redTotal:Number(S.red[0].amt||0)+Number(S.red[1].amt||0)+Number(S.red[2].amt||0),
       fullHouse:hits===9?1:0,
+      rank:Number(S.rank||0),
+      prizeCredit:(hits===9 && S.mode!=="solo" && S.rank>=1 && S.rank<=PRIZE_TOP_N) ? PRIZE_CREDIT : 0,
       startedAt:S.startedAt,
       finished:hits===9?1:0
     };
@@ -1223,6 +1242,7 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:rgba(2
         if(Array.isArray(d.hits)&&d.hits.length===9) S.hits=d.hits.map(function(v){ return !!Number(v); });
         S.food=d.food||""; S.drink=d.drink||""; S.wish=d.wish||"";
         S.foodDone=d.foodDone||""; S.drinkDone=d.drinkDone||"";
+        S.rank=Number(d.rank||0);
         S.red=[{amt:Number(d.red1||0),at:d.foodDone||""},
                {amt:Number(d.red2||0),at:d.drinkDone||""},
                {amt:Number(d.red3||0),at:""}];
@@ -1354,6 +1374,32 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:rgba(2
                : (names[i]+" 已清除"));
   }
 
+  function hasCredit(){
+    return countHits()===9 && S.mode!=="solo" && S.rank>=1 && S.rank<=PRIZE_TOP_N;
+  }
+  function saveRank(raw){
+    var v=String(raw==null?"":raw).replace(/[^0-9]/g,"");
+    var r = v==="" ? 0 : Number(v);
+    if(r===Number(S.rank||0)){ render(); return; }
+    if(r>0 && countHits()<9){
+      ask({title:"還沒全連", body:"目前 "+countHits()+"/9 格，確定要先登記第 "+r+" 名嗎？", ok:"還是要登記"},
+      function(ok){ if(!ok){ render(); return; } S.rank=r; save(); render(); syncNow(true); toastRank(r); });
+      return;
+    }
+    S.rank=r; save(); render(); syncNow(true);
+    if(r===0) toast("名次登記已清除"); else toastRank(r);
+  }
+  function toastRank(r){
+    toast(r<=PRIZE_TOP_N
+      ? ("第 "+r+" 名！可得 "+fmtAmt(PRIZE_CREDIT)+" 點餐額度 ＋ 抽紅包")
+      : ("第 "+r+" 名・前 "+PRIZE_TOP_N+" 名已額滿，只有抽紅包"));
+  }
+  $("btn-rank-save").addEventListener("click", function(){ saveRank($("ops-rank").value); });
+  $("ops-rank").addEventListener("keydown", function(e){
+    if(e.key==="Enter"){ e.preventDefault(); saveRank(this.value); this.blur(); }
+  });
+  $("ops-rank").addEventListener("blur", function(){ saveRank(this.value); });
+
   (function bindRedInputs(){
     for(var i=0;i<3;i++){
       (function(idx){
@@ -1413,7 +1459,7 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:rgba(2
       picked=[];
       S={mode:"duo",user:"",host:"",type:"preset",tasks:BANK_DUO.slice(0,9),
          hits:[false,false,false,false,false,false,false,false,false],
-         locked:false,food:"",drink:"",wish:"",firstAll:false,
+         locked:false,food:"",drink:"",wish:"",firstAll:false,rank:0,
          foodPend:"",drinkPend:"",
          foodDone:"",drinkDone:"",red:[{amt:0,at:""},{amt:0,at:""},{amt:0,at:""}],
          startedAt:"",device:deviceId()};
@@ -1438,7 +1484,12 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:rgba(2
       (solo ? "" : "紅包："+fmtAmt(S.red[0].amt)+" / "+fmtAmt(S.red[1].amt)+" / "+fmtAmt(S.red[2].amt)+
               "　合計 "+fmtAmt(Number(S.red[0].amt)+Number(S.red[1].amt)+Number(S.red[2].amt))+" "+RED_UNIT+"\n")+
       (solo ? "已解鎖餐點："+countMeals()+" 項\n" : "可抽紅包："+red+" 次\n")+
-      "全連："+(hits===9?(solo?"是（單人軌）":"是（需登記是否第一名／5,000 點餐額度）"):"否")+"\n"+
+      "全連："+(hits===9
+        ? (solo ? "是（單人軌）"
+                : "是・"+(S.rank>=1
+                    ? ("第 "+S.rank+" 名"+(S.rank<=PRIZE_TOP_N?"（給 "+fmtAmt(PRIZE_CREDIT)+" 點餐額度）":"（僅抽紅包）"))
+                    : "名次未登記"))
+        : "否")+"\n"+
       "許願："+(S.wish||"—")+"\n"+
       "裝置："+deviceId()+"　待送佇列："+q+" 筆";
     ask({title:"結算摘要", body:txt, ok:"複製"}, function(ok){
@@ -1457,7 +1508,7 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:rgba(2
     ["stamps","蓋章數"],["lines","連線數"],["redEnvelopes","可抽紅包次數"],
     ["food","主食"],["foodDone","主食核銷"],["drink","飲品"],["drinkDone","飲品核銷"],
     ["red1","紅包1"],["red2","紅包2"],["red3","紅包3"],["redTotal","紅包合計"],
-    ["fullHouse","全連"],["mealsUnlocked","解鎖餐點"],["wish","許願"],["device","裝置"],["tasks","任務內容"]
+    ["fullHouse","全連"],["rank","全連名次"],["prizeCredit","點餐額度"],["mealsUnlocked","解鎖餐點"],["wish","許願"],["device","裝置"],["tasks","任務內容"]
   ];
   function histRows(){
     var a=histRead(), rows=[HIST_COLS.map(function(c){ return c[1]; })];
@@ -1630,16 +1681,22 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:rgba(2
                     + (!solo && r2>0 ? "・紅包 "+fmtAmt(r2)+" "+RED_UNIT : ""))
                  : (S.drinkPend ? "已選："+S.drinkPend+"・待確認送出" : "已達成・待選飲品"))
       : "尚未達成";
+    var rk=Number(S.rank||0);
     $("t3-st").textContent = hits===9
       ? (solo ? "已完成全部 9 格"
-              : "已全連・請登記第一名與 5,000 點餐額度" + (r3>0 ? "・紅包 "+fmtAmt(r3)+" "+RED_UNIT : ""))
+              : (rk<1 ? "已全連・待工作人員登記名次"
+                      : (rk<=PRIZE_TOP_N
+                          ? "第 "+rk+" 名・"+fmtAmt(PRIZE_CREDIT)+" 點餐額度"+(r3>0?"・紅包 "+fmtAmt(r3)+" "+RED_UNIT:"")
+                          : "第 "+rk+" 名・僅抽紅包"+(r3>0?" "+fmtAmt(r3)+" "+RED_UNIT:""))))
       : "尚未達成";
 
     var rTail = solo ? "" : " ＋抽紅包 ×1";
     $("t1-tx").innerHTML = "<b>選 1 份主食（"+FOOD.length+" 選 1）</b>"+rTail;
     $("t2-tx").innerHTML = "<b>選 1 樣飲品（"+DRINK.length+" 選 1）</b>"+rTail;
-    $("t3-tx").innerHTML = solo ? "<b>完成全部 9 格</b> 餐點全部解鎖"
-                                : "<b>第一名 5,000 點餐額度</b> ＋抽紅包 ×1";
+    $("t3-tx").innerHTML = solo
+      ? "<b>完成全部 9 格</b> 餐點全部解鎖"
+      : "<b>前 "+PRIZE_TOP_N+" 名得 "+fmtAmt(PRIZE_CREDIT)+" 點餐額度</b> ＋抽紅包 ×1<br>"+
+        "<span style=\"font-size:12px\">第 "+(PRIZE_TOP_N+1)+" 名以後全連：抽紅包 ×1</span>";
     $("food-h").textContent="主食 "+FOOD.length+" 選 1";
     $("drink-h").textContent="飲品 "+DRINK.length+" 選 1";
     $("s-red-k").textContent = solo ? "已解鎖餐點" : "可抽紅包";
@@ -1669,6 +1726,17 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:rgba(2
                                    + (S.drinkDone ? "　✅ 已出餐 "+S.drinkDone : "");
     var redTotal = Number(S.red[0].amt||0)+Number(S.red[1].amt||0)+Number(S.red[2].amt||0);
     $("ops-full-t").textContent = "全連：" + (hits===9 ? "已達成（9/9）" : hits+"/9");
+    $("ops-rank-row").classList.toggle("hide", solo);
+    $("ops-rank-note").classList.toggle("hide", solo);
+    if(!solo){
+      var rkv=Number(S.rank||0);
+      if(document.activeElement!==$("ops-rank")) $("ops-rank").value = rkv>0 ? String(rkv) : "";
+      $("ops-rank-note").textContent = rkv<1
+        ? ("前 "+PRIZE_TOP_N+" 名得 "+fmtAmt(PRIZE_CREDIT)+" 點餐額度＋抽紅包；之後全連只有抽紅包。")
+        : (rkv<=PRIZE_TOP_N
+            ? ("✅ 第 "+rkv+" 名 → 給 "+fmtAmt(PRIZE_CREDIT)+" 點餐額度 ＋ 抽紅包")
+            : ("第 "+rkv+" 名 → 只有抽紅包，不給點餐額度"));
+    }
 
     // 單人軌沒有紅包 → 整排輸入欄隱藏
     var moneyRows=document.querySelectorAll(".ops-money");
@@ -1691,6 +1759,13 @@ code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:rgba(2
     $("card-money").classList.toggle("hide", solo || redTotal<=0);
     $("card-money-v").textContent=fmtAmt(redTotal);
     $("card-money-u").textContent=RED_UNIT;
+
+    var credit=hasCredit();
+    $("card-credit").classList.toggle("hide", !credit);
+    if(credit){
+      $("card-credit-k").textContent="第 "+rk+" 名・點餐額度";
+      $("card-credit-v").textContent=fmtAmt(PRIZE_CREDIT);
+    }
 
     $("in-wish").value=S.wish;
     $("wish-note").textContent = S.wish ? ("已送出："+S.wish) : "寫好後按「送出」，主辦才收得到。";
